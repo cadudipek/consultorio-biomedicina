@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, flash, g, redirect, render_template, url_for
 
-from .db import q
+from . import inicial
+from .db import commit, q, q1
 from .seguranca import login_required
 
 bp = Blueprint("painel", __name__)
@@ -29,4 +30,32 @@ def inicio():
         "WHERE EXISTS (SELECT 1 FROM atendimento_documentos d WHERE d.atendimento_id=a.id) "
         "AND NOT EXISTS (SELECT 1 FROM atendimento_documentos d WHERE d.atendimento_id=a.id AND d.status!='conferido') "
         "ORDER BY a.data_atendimento DESC, a.id DESC LIMIT 8")
-    return render_template("painel.html", aguardando=aguardando, concluidos=concluidos)
+    n = {k: q1(f"SELECT COUNT(*) AS n FROM {t} WHERE {w}")["n"] for k, t, w in (
+        ("termos", "termos_modelo", "ativo=1"), ("fichas", "fichas_modelo", "ativo=1"),
+        ("procs", "procedimentos", "ativo=1"), ("pacs", "pacientes", "1=1"), ("atends", "atendimentos", "1=1"))}
+    passos = [
+        ("Escolher a ficha de anamnese e os termos", n["fichas"] > 0 and n["termos"] > 0, "/modelos/"),
+        ("Cadastrar seus procedimentos", n["procs"] > 0, "/procedimentos/"),
+        ("Cadastrar a primeira paciente", n["pacs"] > 0, "/pacientes/novo"),
+        ("Abrir o primeiro atendimento", n["atends"] > 0, "/pacientes/"),
+    ]
+    ultimo_backup = q1("SELECT MAX(criado_em) AS m FROM auditoria WHERE acao='backup'")["m"]
+    lembrar_backup = n["pacs"] > 0 and (not ultimo_backup or
+                                        q1("SELECT julianday('now') - julianday(?) > 7 AS v", (ultimo_backup,))["v"])
+    nomes = [p for p in g.user["nome"].split() if not p.endswith(".")]
+    return render_template("painel.html", primeiro_nome=nomes[0] if nomes else "", aguardando=aguardando, concluidos=concluidos, passos=passos,
+                           mostrar_passos=not all(p[1] for p in passos), sem_modelos=n["fichas"] == 0 and n["termos"] == 0,
+                           lembrar_backup=lembrar_backup, ultimo_backup=ultimo_backup)
+
+
+@bp.route("/modelos-iniciais", methods=["POST"])
+@login_required("profissional")
+def modelos_iniciais():
+    if inicial.ja_existe():
+        flash("Os modelos iniciais já foram criados.", "info")
+    else:
+        inicial.criar()
+        commit()
+        flash("Pronto! Criamos uma ficha de anamnese, os dois termos e um procedimento de exemplo. "
+              "Revise os textos em “Fichas e termos” antes de usar com pacientes.", "ok")
+    return redirect(url_for("painel.inicio"))

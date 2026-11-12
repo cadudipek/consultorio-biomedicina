@@ -3,7 +3,7 @@
 {% macro status_tag(d) %}
   {% if d.status=='pendente' %}<span class="tag pend">{{ 'Aguardando assinatura' if d.tipo=='termo' else 'Ficha incompleta' }}</span>
   {% elif d.status=='conferido' %}<span class="tag">Conferido</span>
-  {% else %}<span class="tag info">{{ 'Assinado — conferir' if d.tipo=='termo' else 'Preenchida — conferir' }}</span>{% endif %}
+  {% else %}<span class="tag info">{{ 'Assinado · falta conferir' if d.tipo=='termo' else 'Preenchida · falta conferir' }}</span>{% endif %}
 {% endmacro %}
 {% block conteudo %}
 <div class="linha-topo"><div><h1 style="margin-bottom:.2rem">{{ a.procedimento }}</h1>
@@ -23,13 +23,31 @@
   </div></div>
 {% endif %}
 
+{% set pend = docs|selectattr('status','equalto','pendente')|list %}
+{% set conf = docs|selectattr('status','in',['preenchido','assinado'])|list %}
+<div class="card proximo">
+{% if pend %}
+  <h2>Próximo passo: documentos da paciente</h2>
+  <p>Faltam {{ pend|length }} documento(s): {% for d in pend %}<strong>{{ d.nome }}</strong>{{ ', ' if not loop.last }}{% endfor %}.</p>
+  <form method="post" action="/atendimentos/{{ a.id }}/presencial"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn" type="submit">Entregar para a paciente preencher e assinar</button></form>
+  <p class="ajuda">Abre uma tela simples, só com os documentos dela. Entregue o computador ou tablet; ao final, ela toca em “Concluir e devolver à profissional”.</p>
+{% elif conf %}
+  <h2>Próximo passo: conferir</h2>
+  <p>A paciente já preencheu tudo. Abra cada documento marcado “conferir”, leia e clique em <strong>Marcar como conferido</strong>.</p>
+{% else %}
+  <h2>Documentação completa ✓</h2>
+  <p>Tudo preenchido, assinado e conferido. Você pode <a href="/atendimentos/{{ a.id }}/pdf">baixar o PDF</a> para arquivar ou imprimir.</p>
+{% endif %}
+</div>
+
 <div class="card"><h2>Documentos</h2>
 {% for d in docs %}
   <div class="linha-lista">
     <div><strong>{{ d.nome }}</strong> <span class="meta">v{{ d.versao }}</span>
       <span class="tag cinza">{{ 'Ficha' if d.tipo=='ficha' else ('Consentimento' if d.tipo_termo=='consentimento' else 'Imagem') }}</span> {{ status_tag(d) }}</div>
     <div class="form-acoes" style="margin:0">
-    {% if d.status=='pendente' and d.tipo=='termo' %}<form method="post" action="/atendimentos/{{ a.id }}/presencial"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="doc" value="{{ d.id }}"><button class="btn peq" type="submit">Assinar com a paciente</button></form>{% endif %}
+    {% if d.status=='pendente' and d.tipo=='termo' %}<form method="post" action="/atendimentos/{{ a.id }}/presencial"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="doc" value="{{ d.id }}"><button class="btn sec peq" type="submit">Só este termo</button></form>{% endif %}
     {% if g.user.papel != 'assistente' %}<a class="btn sec peq" href="/atendimentos/{{ a.id }}/documentos/{{ d.id }}">{{ 'Abrir' if d.status!='pendente' else ('Preencher aqui' if d.tipo=='ficha' else 'Ver texto') }}</a>{% endif %}
     </div>
   </div>
@@ -50,7 +68,7 @@
     {% if not l.revogado_em and l.expira_em >= agora %}<form method="post" action="/atendimentos/{{ a.id }}/links/{{ l.id }}/revogar"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn perigo peq">Revogar</button></form>{% endif %}
   </div>{% endfor %}
 </div>
-{% else %}<div class="card"><h2>Preenchimento pelo celular da paciente</h2><p class="meta">Disponível na versão hospedada na internet. Neste computador, use <strong>Assinar com a paciente</strong> acima: entregue o aparelho para ela ler e assinar.</p></div>{% endif %}
+{% endif %}
 
 {% if g.user.papel != 'assistente' %}
 <form method="post" action="/atendimentos/{{ a.id }}/editar" class="card"><h2>Registro do atendimento</h2>

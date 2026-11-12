@@ -7,6 +7,8 @@ from xml.sax.saxutils import escape
 
 from flask import Blueprint, abort, current_app, flash, g, redirect, render_template, request, send_file, url_for
 from reportlab.lib import colors
+
+from . import _fmt_cpf, _fmt_dt
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm
@@ -68,8 +70,8 @@ def _bloco_documento(d, a, st):
             itens.append(Paragraph("<b>Assinatura eletrônica</b>", st["p"]))
             itens.append(Paragraph(
                 f"Resultado: <b>{'ACEITE / AUTORIZAÇÃO' if ass['aceite'] else 'NÃO AUTORIZOU'}</b><br/>"
-                f"Signatário: {_txt(ass['nome_signatario'])} — CPF {_txt(ass['cpf_signatario'])}<br/>"
-                f"Data e hora (UTC): {ass['assinado_em']} · IP: {_txt(ass['ip'])}<br/>"
+                f"Signatário: {_txt(ass['nome_signatario'])} — CPF {_fmt_cpf(ass['cpf_signatario'])}<br/>"
+                f"Data e hora: {_fmt_dt(ass['assinado_em'], '%d/%m/%Y %H:%M:%S')} (horário de Brasília; registro UTC {ass['assinado_em']}) · IP: {_txt(ass['ip'])}<br/>"
                 f"Declaração aceita: “{_txt(ass['texto_aceite'])}”", st["p"]))
             if ass["desenho_png"]:
                 try:
@@ -78,7 +80,7 @@ def _bloco_documento(d, a, st):
                     pass
     adendos = q("SELECT ad.*, u.nome AS autor FROM adendos ad LEFT JOIN usuarios u ON u.id=ad.usuario_id WHERE documento_id=? ORDER BY ad.id", (d["id"],))
     for ad in adendos:
-        itens.append(Paragraph(f"<b>Adendo</b> ({ad['criado_em']} UTC, {_txt(ad['autor'])}): {_txt(ad['texto'])}", st["pq"]))
+        itens.append(Paragraph(f"<b>Adendo</b> ({_fmt_dt(ad['criado_em'])}, {_txt(ad['autor'])}): {_txt(ad['texto'])}", st["pq"]))
     integro = verificar_integridade(d["id"])
     sel = "íntegro (confere com o registrado)" if integro else "ALTERADO após a conclusão"
     itens.append(Paragraph(f"Integridade: <b>{sel}</b><br/>SHA-256: {d['hash_documento']}", st["mono"]))
@@ -201,6 +203,28 @@ def dados_zip():
     auditar("exportar_dados", "sistema", None)
     commit()
     return send_file(buf, mimetype="application/zip", as_attachment=True, download_name="dados-consultorio.zip")
+
+
+@bp.route("/exportacao/restaurar", methods=["POST"])
+@login_required("admin")
+def restaurar_backup():
+    from flask import session
+    from .backup import BackupInvalido, restaurar
+    f = request.files.get("arquivo")
+    if not f or not f.filename:
+        flash("Escolha o arquivo de backup.", "erro")
+        return redirect(url_for("exportacao.pagina"))
+    if request.form.get("confirmo") != "1":
+        flash("Marque a confirmação: os dados atuais serão substituídos pelos do backup.", "erro")
+        return redirect(url_for("exportacao.pagina"))
+    try:
+        restaurar(current_app, f)
+    except BackupInvalido as e:
+        flash(str(e), "erro")
+        return redirect(url_for("exportacao.pagina"))
+    session.clear()
+    flash("Backup restaurado. Entre com o e-mail e a senha que valiam quando o backup foi feito.", "ok")
+    return redirect(url_for("auth.login"))
 
 
 @bp.route("/exportacao/backup", methods=["POST"])

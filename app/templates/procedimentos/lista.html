@@ -12,6 +12,6 @@
     <a class="btn sec peq" href="/procedimentos/{{ p.id }}/editar">Editar</a>
     <form method="post" action="/procedimentos/{{ p.id }}/alternar"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn sec peq" type="submit">{{ 'Desativar' if p.ativo else 'Reativar' }}</button></form></div>{% endif %}
 </div>
-{% else %}<div class="vazio">Nenhum procedimento cadastrado.</div>{% endfor %}
+{% else %}<div class="vazio">Nenhum procedimento cadastrado ainda.<br>Um procedimento junta a ficha de anamnese e os termos que a paciente precisa preencher.{% if g.user.papel != 'assistente' %}<br><a class="btn" style="margin-top:.75rem" href="/procedimentos/novo">Cadastrar o primeiro</a>{% endif %}</div>{% endfor %}
 </div>
 {% endblock %}

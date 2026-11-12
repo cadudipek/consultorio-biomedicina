@@ -76,6 +76,27 @@ def primeiro_acesso():
     return render_template("auth/primeiro_acesso.html")
 
 
+@bp.route("/primeiro-acesso/restaurar", methods=["POST"])
+def primeiro_acesso_restaurar():
+    """Computador novo: restaura um backup antes de criar qualquer usuário."""
+    from flask import current_app
+    from .backup import BackupInvalido, restaurar
+    if q1("SELECT 1 FROM usuarios LIMIT 1"):
+        return redirect(url_for("auth.login"))
+    f = request.files.get("arquivo")
+    if not f or not f.filename:
+        flash("Escolha o arquivo de backup.", "erro")
+        return redirect(url_for("auth.primeiro_acesso"))
+    try:
+        restaurar(current_app, f)
+    except BackupInvalido as e:
+        flash(str(e), "erro")
+        return redirect(url_for("auth.primeiro_acesso"))
+    session.clear()
+    flash("Seus dados foram recuperados. Entre com o seu e-mail e senha de sempre.", "ok")
+    return redirect(url_for("auth.login"))
+
+
 @bp.route("/sair", methods=["POST"])
 def logout():
     if g.user:
