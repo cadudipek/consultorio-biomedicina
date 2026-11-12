@@ -216,3 +216,21 @@ def test_filtro_por_procedimento(pro):
     pro.post("/pacientes/novo", {"nome": "Sem Atendimento"})
     html = pro.get("/pacientes/?procedimento=1").get_data(as_text=True)
     assert "Paciente Fictício" in html and "Sem Atendimento" not in html
+
+
+def test_assinatura_presencial_pelo_aparelho_da_profissional(pro, app):
+    montar_cenario(pro)
+    r = pro.post("/atendimentos/1/presencial", {"doc": "2"})
+    assert r.status_code == 302 and "/termo/2" in r.headers["Location"]
+    destino = r.headers["Location"]
+    pagina = pro.get(destino)
+    assert pagina.status_code == 200
+    # ação auditada e termo assinável neste aparelho
+    aud = consulta(app, "SELECT acao FROM auditoria WHERE acao='criar_link_presencial'")
+    assert len(aud) == 1
+    # documento que não é termo pendente do atendimento cai na tela inicial da paciente
+    r = pro.post("/atendimentos/1/presencial", {"doc": "999"})
+    assert r.status_code == 302 and "/termo/" not in r.headers["Location"]
+    # sem login não é possível gerar o link presencial
+    anon = paciente_cli(app)
+    assert anon.post("/atendimentos/1/presencial", {}).status_code in (302, 400)

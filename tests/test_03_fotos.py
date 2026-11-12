@@ -34,7 +34,7 @@ def test_upload_valido_remove_exif_e_fica_fora_de_static(pro, app):
     assert os.path.exists(caminho) and "static" not in caminho
     with Image.open(caminho) as im:
         assert not im.getexif() and "exif" not in im.info
-    assert f["nome_original"] == "f.jpg" and f["caminho"].endswith(".jpg") and "f.jpg" not in f["caminho"]
+    assert f["nome_original"] == "f.jpg" and f["caminho"].endswith(".jpg") and os.path.basename(f["caminho"]) != "f.jpg"
 
 
 def test_rejeita_arquivo_que_nao_e_imagem(pro, app):

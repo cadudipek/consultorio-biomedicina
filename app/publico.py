@@ -2,7 +2,7 @@
 import hashlib
 from datetime import datetime, timezone
 
-from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, request, session, url_for
 
 from .db import commit, q, q1, run
 from .documentos import (TEXTO_ACEITE, assinar_termo, campos_da_versao, concluir_ficha, ler_respostas,
@@ -47,7 +47,8 @@ def inicio(token):
              "LEFT JOIN termos_versao tv ON tv.id=d.termo_versao_id LEFT JOIN termos_modelo t ON t.id=tv.termo_id "
              "WHERE d.atendimento_id=? ORDER BY d.tipo, t.tipo, d.id", (a["id"],))
     pendentes = sum(1 for d in docs if d["status"] == "pendente")
-    return render_template("publico/inicio.html", token=token, a=a, docs=docs, pendentes=pendentes, primeiro_nome=a["paciente"].split()[0])
+    return render_template("publico/inicio.html", token=token, a=a, docs=docs, pendentes=pendentes, primeiro_nome=a["paciente"].split()[0],
+                           presencial_aid=session.get("presencial_aid"))
 
 
 @bp.route("/<token>/ficha/<int:did>", methods=["GET", "POST"])

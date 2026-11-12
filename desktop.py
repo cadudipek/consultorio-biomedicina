@@ -25,7 +25,7 @@ def main():
     from app import create_app
     from app import db as dbmod
 
-    app = create_app({"PRIMEIRO_ACESSO": not demo})
+    app = create_app({"PRIMEIRO_ACESSO": not demo, "LINK_REMOTO": False})
     with app.app_context():
         dbmod.init_db()
         if demo and dbmod.q1("SELECT 1 FROM usuarios LIMIT 1") is None:

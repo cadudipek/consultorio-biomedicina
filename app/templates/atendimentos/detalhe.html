@@ -28,12 +28,15 @@
   <div class="linha-lista">
     <div><strong>{{ d.nome }}</strong> <span class="meta">v{{ d.versao }}</span>
       <span class="tag cinza">{{ 'Ficha' if d.tipo=='ficha' else ('Consentimento' if d.tipo_termo=='consentimento' else 'Imagem') }}</span> {{ status_tag(d) }}</div>
+    <div class="form-acoes" style="margin:0">
+    {% if d.status=='pendente' and d.tipo=='termo' %}<form method="post" action="/atendimentos/{{ a.id }}/presencial"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="doc" value="{{ d.id }}"><button class="btn peq" type="submit">Assinar com a paciente</button></form>{% endif %}
     {% if g.user.papel != 'assistente' %}<a class="btn sec peq" href="/atendimentos/{{ a.id }}/documentos/{{ d.id }}">{{ 'Abrir' if d.status!='pendente' else ('Preencher aqui' if d.tipo=='ficha' else 'Ver texto') }}</a>{% endif %}
+    </div>
   </div>
 {% else %}<div class="vazio">Sem documentos neste atendimento.</div>{% endfor %}
 </div>
 
-<div class="card"><h2>Preenchimento remoto (link para o paciente)</h2>
+{% if link_remoto %}<div class="card"><h2>Preenchimento remoto (link para o paciente)</h2>
   <form method="post" action="/atendimentos/{{ a.id }}/links" class="busca">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div><label for="h">Validade</label><select id="h" name="horas">
@@ -47,6 +50,7 @@
     {% if not l.revogado_em and l.expira_em >= agora %}<form method="post" action="/atendimentos/{{ a.id }}/links/{{ l.id }}/revogar"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn perigo peq">Revogar</button></form>{% endif %}
   </div>{% endfor %}
 </div>
+{% else %}<div class="card"><h2>Preenchimento pelo celular da paciente</h2><p class="meta">Disponível na versão hospedada na internet. Neste computador, use <strong>Assinar com a paciente</strong> acima: entregue o aparelho para ela ler e assinar.</p></div>{% endif %}
 
 {% if g.user.papel != 'assistente' %}
 <form method="post" action="/atendimentos/{{ a.id }}/editar" class="card"><h2>Registro do atendimento</h2>
