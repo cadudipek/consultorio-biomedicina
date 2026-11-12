@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block titulo %}Novo termo{% endblock %}
+{% block conteudo %}
+<h1>Novo termo</h1>
+<div class="card"><form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="t">Título *</label><input id="t" name="titulo" type="text" required value="{{ f.get('titulo') or '' }}">
+  <label for="tp">Tipo *</label>
+  <select id="tp" name="tipo"><option value="consentimento" {{ 'selected' if f.get('tipo')=='consentimento' }}>Consentimento do procedimento</option><option value="imagem" {{ 'selected' if f.get('tipo')=='imagem' }}>Autorização de uso de imagem</option></select>
+  <div class="ajuda">Consentimento e autorização de imagem são documentos separados: o paciente decide cada um.</div>
+  <label for="c">Texto do termo *</label><textarea id="c" name="conteudo" required style="min-height:260px">{{ f.get('conteudo') or '' }}</textarea>
+  <div class="ajuda">Cole aqui o texto fornecido pela profissional. Cada edição futura cria uma nova versão; as anteriores ficam preservadas.</div>
+  <div class="form-acoes"><button class="btn" type="submit">Salvar termo</button><a class="btn sec" href="/modelos/">Cancelar</a></div>
+</form></div>
+{% endblock %}

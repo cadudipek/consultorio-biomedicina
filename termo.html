@@ -1,0 +1,40 @@
+{% extends "publico/base.html" %}
+{% block titulo %}{{ d.nome }}{% endblock %}
+{% block conteudo %}
+<h1>{{ d.nome }}</h1>
+<p class="meta">{{ 'Consentimento do procedimento' if d.tipo_termo=='consentimento' else 'Autorização de uso de imagem' }}. Leia com atenção até o final.</p>
+<div class="card"><div class="termo-texto" tabindex="0" aria-label="Texto do termo">{{ d.termo_texto }}</div></div>
+<form method="post" class="card" id="form-assina">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <h2>Identificação de quem assina</h2>
+  <label for="nome">Nome completo *</label><input id="nome" name="nome" type="text" required autocomplete="name" value="{{ f.get('nome') or '' }}">
+  <label for="cpf">CPF *</label><input id="cpf" name="cpf" type="text" inputmode="numeric" maxlength="14" required value="{{ f.get('cpf') or '' }}">
+  <div class="ajuda">Se você assina como responsável legal, informe o seu nome e CPF.</div>
+  {% if d.tipo_termo == 'imagem' %}
+  <fieldset style="border:0;padding:0;margin:1rem 0 0"><legend style="font-weight:600">Sua decisão *</legend>
+    <label class="opcao"><input type="radio" name="decisao" value="autorizo" {{ 'checked' if f.get('decisao')=='autorizo' }}>Autorizo o uso de imagem</label>
+    <label class="opcao"><input type="radio" name="decisao" value="nao_autorizo" {{ 'checked' if f.get('decisao')=='nao_autorizo' }}>Não autorizo o uso de imagem</label></fieldset>
+  {% endif %}
+  <label class="opcao" style="margin-top:1rem"><input type="checkbox" name="confirmo" value="1" required><span>{{ texto_aceite }}</span></label>
+  <label>Desenho da assinatura (opcional)</label>
+  <canvas id="assin" class="assin" aria-label="Área para desenhar a assinatura com o dedo"></canvas>
+  <input type="hidden" name="desenho" id="desenho">
+  <div class="ajuda">O desenho é só um complemento. O que vale é a sua identificação e a confirmação acima, registradas com data, hora e verificação de integridade.</div>
+  <div class="form-acoes"><button type="button" class="btn sec" id="limpar">Limpar desenho</button><button type="submit" class="btn">Assinar e enviar</button></div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  var cv = document.getElementById('assin'), ctx, desenhando = false, tem = false;
+  function ajustar() { var r = cv.getBoundingClientRect(); cv.width = r.width * 2; cv.height = r.height * 2; ctx = cv.getContext('2d'); ctx.scale(2, 2); ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.strokeStyle = '#111'; }
+  ajustar();
+  function pos(e) { var r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+  cv.addEventListener('pointerdown', function (e) { desenhando = true; tem = true; var p = pos(e); ctx.beginPath(); ctx.moveTo(p[0], p[1]); cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener('pointermove', function (e) { if (!desenhando) return; var p = pos(e); ctx.lineTo(p[0], p[1]); ctx.stroke(); });
+  ['pointerup', 'pointercancel'].forEach(function (n) { cv.addEventListener(n, function () { desenhando = false; }); });
+  document.getElementById('limpar').onclick = function () { ctx.clearRect(0, 0, cv.width, cv.height); tem = false; };
+  document.getElementById('form-assina').addEventListener('submit', function () { if (tem) document.getElementById('desenho').value = cv.toDataURL('image/png'); });
+})();
+</script>
+{% endblock %}

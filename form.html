@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Novo procedimento' if novo else 'Editar procedimento' }}{% endblock %}
+{% block conteudo %}
+<h1>{{ 'Novo procedimento' if novo else 'Editar procedimento' }}</h1>
+<form method="post">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="card">
+  <label for="nome">Nome *</label><input id="nome" name="nome" type="text" required value="{{ proc.get('nome') or '' }}">
+  <label for="desc">Descrição</label><textarea id="desc" name="descricao" style="min-height:70px">{{ proc.get('descricao') or '' }}</textarea>
+</div>
+<div class="grade">
+<div class="card"><h2>Fichas (anamnese)</h2>
+  {% for f in fichas %}<label class="opcao"><input type="checkbox" name="fichas" value="{{ f.id }}" {{ 'checked' if f.id in sel_f }}><span>{{ f.nome }}{% if f.demonstracao %}<span class="demo">DEMONSTRAÇÃO</span>{% endif %}</span></label>
+  {% else %}<p class="meta">Nenhuma ficha criada ainda. Crie em “Fichas e termos”.</p>{% endfor %}
+</div>
+<div class="card"><h2>Termos</h2>
+  {% for t in termos %}<label class="opcao"><input type="checkbox" name="termos" value="{{ t.id }}" {{ 'checked' if t.id in sel_t }}><span>{{ t.titulo }} <span class="tag info">{{ 'Consentimento' if t.tipo=='consentimento' else 'Uso de imagem' }}</span>{% if t.demonstracao %}<span class="demo">DEMONSTRAÇÃO</span>{% endif %}</span></label>
+  {% else %}<p class="meta">Nenhum termo criado ainda. Crie em “Fichas e termos”.</p>{% endfor %}
+</div>
+</div>
+<div class="form-acoes"><button class="btn" type="submit">Salvar</button><a class="btn sec" href="/procedimentos/">Cancelar</a></div>
+</form>
+{% endblock %}

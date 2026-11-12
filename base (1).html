@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block titulo %}Consultório{% endblock %} · Gestão de Pacientes</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topo"><div class="topo-in">
+  <a class="marca" href="/">Gestão de Pacientes</a>
+  {% if g.user %}
+  <nav class="nav" aria-label="Menu principal">
+    <a href="/" class="{{ 'ativo' if request.path=='/' }}">Pendências</a>
+    <a href="/pacientes/" class="{{ 'ativo' if request.path.startswith('/pacientes') }}">Pacientes</a>
+    <a href="/procedimentos/" class="{{ 'ativo' if request.path.startswith('/procedimentos') }}">Procedimentos</a>
+    {% if g.user.papel != 'assistente' %}<a href="/modelos/" class="{{ 'ativo' if request.path.startswith('/modelos') }}">Fichas e termos</a>
+    <a href="/exportacao/" class="{{ 'ativo' if request.path.startswith('/exportacao') }}">Exportar</a>{% endif %}
+    <a href="/configuracoes" class="{{ 'ativo' if request.path.startswith('/configuracoes') }}">Configurações</a>
+    <form method="post" action="/sair" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Sair</button></form>
+  </nav>
+  {% endif %}
+</div></header>
+<main id="conteudo">
+  {% with msgs = get_flashed_messages(with_categories=true) %}{% if msgs %}
+  <ul class="msgs" role="status">{% for cat, m in msgs %}<li class="msg {{ cat }}">{{ m }}</li>{% endfor %}</ul>
+  {% endif %}{% endwith %}
+  {% block conteudo %}{% endblock %}
+</main>
+<div class="rodape">Dados de demonstração são fictícios e identificados como tal.</div>
+{% block scripts %}{% endblock %}
+</body>
+</html>

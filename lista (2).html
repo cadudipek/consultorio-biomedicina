@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block titulo %}Procedimentos{% endblock %}
+{% block conteudo %}
+<div class="linha-topo"><h1>Procedimentos</h1>{% if g.user.papel != 'assistente' %}<a class="btn" href="/procedimentos/novo">Novo procedimento</a>{% endif %}</div>
+<div class="card">
+{% for p in procs %}
+<div class="linha-lista">
+  <div><strong>{{ p.nome }}</strong>{% if p.demonstracao %}<span class="demo">DEMONSTRAÇÃO</span>{% endif %}
+    {% if not p.ativo %} <span class="tag cinza">Inativo</span>{% endif %}
+    <div class="meta">{{ p.n_fichas }} ficha(s) · {{ p.n_termos }} termo(s){% if p.descricao %} · {{ p.descricao }}{% endif %}</div></div>
+  {% if g.user.papel != 'assistente' %}<div style="display:flex;gap:.4rem">
+    <a class="btn sec peq" href="/procedimentos/{{ p.id }}/editar">Editar</a>
+    <form method="post" action="/procedimentos/{{ p.id }}/alternar"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn sec peq" type="submit">{{ 'Desativar' if p.ativo else 'Reativar' }}</button></form></div>{% endif %}
+</div>
+{% else %}<div class="vazio">Nenhum procedimento cadastrado.</div>{% endfor %}
+</div>
+{% endblock %}

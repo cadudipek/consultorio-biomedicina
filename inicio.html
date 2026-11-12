@@ -1,0 +1,16 @@
+{% extends "publico/base.html" %}
+{% block conteudo %}
+<h1>Olá, {{ primeiro_nome }}!</h1>
+<p>Para o seu atendimento de <strong>{{ a.procedimento }}</strong>, preencha os documentos abaixo. Leva poucos minutos e você pode fazer pelo celular.</p>
+<div class="card">
+{% for d in docs %}
+  <div class="linha-lista">
+    <div><strong>{{ d.nome }}</strong><br>
+      <span class="meta">{{ 'Ficha de saúde' if d.tipo=='ficha' else ('Consentimento do procedimento' if d.tipo_termo=='consentimento' else 'Autorização de uso de imagem') }}</span></div>
+    {% if d.status=='pendente' %}<a class="btn" href="/p/{{ token }}/{{ 'ficha' if d.tipo=='ficha' else 'termo' }}/{{ d.id }}">{{ 'Preencher' if d.tipo=='ficha' else 'Ler e assinar' }}</a>
+    {% else %}<span class="tag">Enviado ✓</span>{% endif %}
+  </div>
+{% endfor %}
+</div>
+{% if pendentes == 0 %}<div class="msg ok">Tudo pronto. Obrigado! Você já pode fechar esta página.</div>{% endif %}
+{% endblock %}

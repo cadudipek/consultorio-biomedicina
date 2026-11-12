@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block titulo %}Acesso{% endblock %}
+{% block conteudo %}
+<div class="card login">
+  <h1>Acesso</h1>
+  <form method="post" autocomplete="on">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="email">E-mail</label>
+    <input id="email" name="email" type="email" required autofocus autocomplete="username">
+    <label for="senha">Senha</label>
+    <input id="senha" name="senha" type="password" required autocomplete="current-password">
+    <div class="form-acoes"><button class="btn" type="submit">Entrar</button></div>
+  </form>
+</div>
+{% endblock %}

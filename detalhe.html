@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block titulo %}Atendimento{% endblock %}
+{% macro status_tag(d) %}
+  {% if d.status=='pendente' %}<span class="tag pend">{{ 'Aguardando assinatura' if d.tipo=='termo' else 'Ficha incompleta' }}</span>
+  {% elif d.status=='conferido' %}<span class="tag">Conferido</span>
+  {% else %}<span class="tag info">{{ 'Assinado — conferir' if d.tipo=='termo' else 'Preenchida — conferir' }}</span>{% endif %}
+{% endmacro %}
+{% block conteudo %}
+<div class="linha-topo"><div><h1 style="margin-bottom:.2rem">{{ a.procedimento }}</h1>
+  <div class="meta"><a href="/pacientes/{{ a.paciente_id }}">{{ a.paciente }}</a> · {{ a.data_atendimento|data }}</div></div>
+  {% if g.user.papel != 'assistente' %}<div style="display:flex;gap:.5rem;flex-wrap:wrap">
+    <a class="btn sec" href="/atendimentos/{{ a.id }}/fotos">Fotos ({{ n_arquivos }})</a>
+    <a class="btn sec" href="/atendimentos/{{ a.id }}/pdf">Baixar PDF</a></div>{% endif %}
+</div>
+
+{% if novo_link %}
+<div class="msg ok" role="alert"><strong>Link criado. Copie agora: ele não será exibido de novo.</strong><br>
+  <input type="text" readonly value="{{ novo_link.url }}" onclick="this.select()" style="margin:.5rem 0" aria-label="Link do paciente">
+  Válido até {{ novo_link.expira }}.
+  <div class="form-acoes" style="margin-top:.5rem">
+    <button class="btn peq" type="button" onclick="navigator.clipboard&&navigator.clipboard.writeText('{{ novo_link.url }}').then(()=>this.textContent='Copiado')">Copiar link</button>
+    {% if wa %}<a class="btn peq" href="{{ wa }}" target="_blank" rel="noopener">Enviar pelo WhatsApp</a>{% endif %}
+  </div></div>
+{% endif %}
+
+<div class="card"><h2>Documentos</h2>
+{% for d in docs %}
+  <div class="linha-lista">
+    <div><strong>{{ d.nome }}</strong> <span class="meta">v{{ d.versao }}</span>
+      <span class="tag cinza">{{ 'Ficha' if d.tipo=='ficha' else ('Consentimento' if d.tipo_termo=='consentimento' else 'Imagem') }}</span> {{ status_tag(d) }}</div>
+    {% if g.user.papel != 'assistente' %}<a class="btn sec peq" href="/atendimentos/{{ a.id }}/documentos/{{ d.id }}">{{ 'Abrir' if d.status!='pendente' else ('Preencher aqui' if d.tipo=='ficha' else 'Ver texto') }}</a>{% endif %}
+  </div>
+{% else %}<div class="vazio">Sem documentos neste atendimento.</div>{% endfor %}
+</div>
+
+<div class="card"><h2>Preenchimento remoto (link para o paciente)</h2>
+  <form method="post" action="/atendimentos/{{ a.id }}/links" class="busca">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div><label for="h">Validade</label><select id="h" name="horas">
+      <option value="24">24 horas</option><option value="72" selected>3 dias</option><option value="168">7 dias</option></select></div>
+    <button class="btn" type="submit">Gerar link individual</button>
+  </form>
+  {% for l in links %}
+  <div class="linha-lista"><div>Criado em {{ l.criado_em|dt }} · expira em {{ l.expira_em|dt }}
+    {% if l.revogado_em %}<span class="tag erro">Revogado</span>{% elif l.expira_em < agora %}<span class="tag cinza">Expirado</span>{% else %}<span class="tag">Ativo</span>{% endif %}
+    {% if l.ultimo_acesso %}<div class="meta">Último acesso: {{ l.ultimo_acesso|dt }}</div>{% endif %}</div>
+    {% if not l.revogado_em and l.expira_em >= agora %}<form method="post" action="/atendimentos/{{ a.id }}/links/{{ l.id }}/revogar"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn perigo peq">Revogar</button></form>{% endif %}
+  </div>{% endfor %}
+</div>
+
+{% if g.user.papel != 'assistente' %}
+<form method="post" action="/atendimentos/{{ a.id }}/editar" class="card"><h2>Registro do atendimento</h2>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="dt">Data</label><input id="dt" name="data_atendimento" type="date" value="{{ a.data_atendimento }}">
+  <label for="ob">Observações</label><textarea id="ob" name="observacoes">{{ a.observacoes or '' }}</textarea>
+  <label for="ev">Evolução</label><textarea id="ev" name="evolucao" style="min-height:140px">{{ a.evolucao or '' }}</textarea>
+  <div class="ajuda">Alterações ficam registradas com o texto anterior no histórico de auditoria.</div>
+  <div class="form-acoes"><button class="btn" type="submit">Salvar registro</button></div>
+</form>
+{% endif %}
+{% endblock %}

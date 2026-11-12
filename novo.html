@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titulo %}Novo atendimento{% endblock %}
+{% block conteudo %}
+<h1>Novo atendimento</h1>
+<div class="card"><p style="margin:0"><strong>{{ paciente.nome }}</strong><br><span class="meta">Procedimento: {{ proc.nome }}</span></p></div>
+<form method="post">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<input type="hidden" name="paciente" value="{{ paciente.id }}"><input type="hidden" name="procedimento" value="{{ proc.id }}">
+<div class="card">
+  <label for="data">Data do atendimento *</label><input id="data" name="data_atendimento" type="date" required value="{{ hoje }}">
+  <label for="obs">Observações</label><textarea id="obs" name="observacoes"></textarea>
+</div>
+<div class="card"><h2>Documentos deste atendimento</h2>
+  <p class="meta">Serão fixadas as versões atuais abaixo. Se o texto mudar depois, este atendimento continua com a versão registrada hoje.</p>
+  {% for f in fichas %}<div class="linha-lista"><span>Ficha: {{ f.nome }}</span></div>{% endfor %}
+  {% for t in termos %}<div class="linha-lista"><span>{{ 'Consentimento' if t.tipo=='consentimento' else 'Autorização de imagem' }}: {{ t.nome }}</span></div>{% endfor %}
+  {% if not fichas and not termos %}<div class="vazio">Este procedimento não tem fichas nem termos associados. Associe em “Procedimentos”.</div>{% endif %}
+</div>
+<div class="form-acoes"><button class="btn" type="submit">Abrir atendimento</button><a class="btn sec" href="/pacientes/{{ paciente.id }}">Cancelar</a></div>
+</form>
+{% endblock %}

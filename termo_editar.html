@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block titulo %}Termo{% endblock %}
+{% block conteudo %}
+<h1>{{ termo.titulo }}</h1>
+<p class="meta"><span class="tag info">{{ 'Consentimento do procedimento' if termo.tipo=='consentimento' else 'Autorização de uso de imagem' }}</span> · versão atual: {{ atual.numero }}</p>
+<div class="card"><form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="t">Título</label><input id="t" name="titulo" type="text" required value="{{ termo.titulo }}">
+  <label for="c">Texto (editar cria uma nova versão)</label><textarea id="c" name="conteudo" required style="min-height:260px">{{ atual.conteudo }}</textarea>
+  <div class="form-acoes"><button class="btn" type="submit">Salvar</button><a class="btn sec" href="/modelos/">Voltar</a></div>
+</form></div>
+<div class="card"><h2>Versões</h2>
+{% for v in versoes %}<div class="linha-lista"><div>Versão {{ v.numero }} · criada em {{ v.criado_em|dt }}
+  <div class="meta">Usada em {{ v.usos }} atendimento(s) · SHA-256 {{ v.hash_conteudo[:16] }}…</div></div></div>{% endfor %}
+</div>
+{% endblock %}

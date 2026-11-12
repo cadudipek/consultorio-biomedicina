@@ -1,0 +1,27 @@
+{#- Campo de ficha reutilizado na área da profissional e na página do paciente. Variáveis: c, nome, respostas, opcoes -#}
+{% set v = respostas.get(nome) %}
+{% set sel = respostas.getlist(nome) if respostas.getlist is defined else [] %}
+{% set lista_op = opcoes(c) %}
+<div class="campo-ficha" data-obrig="{{ c.obrigatorio }}">
+{% if c.tipo == 'sim_nao' %}
+  <fieldset style="border:0;padding:0;margin:.9rem 0 0"><legend style="font-weight:600">{{ c.rotulo }}{% if c.obrigatorio %} *{% endif %}</legend>
+    {% if c.ajuda %}<div class="ajuda">{{ c.ajuda }}</div>{% endif %}
+    <div style="display:flex;gap:1.5rem"><label class="opcao"><input type="radio" name="{{ nome }}" value="Sim" {{ 'checked' if v=='Sim' }}>Sim</label>
+    <label class="opcao"><input type="radio" name="{{ nome }}" value="Não" {{ 'checked' if v=='Não' }}>Não</label></div></fieldset>
+{% elif c.tipo == 'escolha_unica' %}
+  <fieldset style="border:0;padding:0;margin:.9rem 0 0"><legend style="font-weight:600">{{ c.rotulo }}{% if c.obrigatorio %} *{% endif %}</legend>
+    {% if c.ajuda %}<div class="ajuda">{{ c.ajuda }}</div>{% endif %}
+    {% for o in lista_op %}<label class="opcao"><input type="radio" name="{{ nome }}" value="{{ o }}" {{ 'checked' if v==o }}>{{ o }}</label>{% endfor %}</fieldset>
+{% elif c.tipo == 'multipla_escolha' %}
+  <fieldset style="border:0;padding:0;margin:.9rem 0 0"><legend style="font-weight:600">{{ c.rotulo }}{% if c.obrigatorio %} *{% endif %}</legend>
+    {% if c.ajuda %}<div class="ajuda">{{ c.ajuda }}</div>{% endif %}
+    {% for o in lista_op %}<label class="opcao"><input type="checkbox" name="{{ nome }}" value="{{ o }}" {{ 'checked' if o in sel }}>{{ o }}</label>{% endfor %}</fieldset>
+{% else %}
+  <label for="{{ nome }}">{{ c.rotulo }}{% if c.obrigatorio %} *{% endif %}</label>
+  {% if c.ajuda %}<div class="ajuda">{{ c.ajuda }}</div>{% endif %}
+  {% if c.tipo == 'texto_longo' %}<textarea id="{{ nome }}" name="{{ nome }}">{{ v or '' }}</textarea>
+  {% elif c.tipo == 'numero' %}<input id="{{ nome }}" name="{{ nome }}" type="text" inputmode="decimal" value="{{ v or '' }}">
+  {% elif c.tipo == 'data' %}<input id="{{ nome }}" name="{{ nome }}" type="date" value="{{ v or '' }}">
+  {% else %}<input id="{{ nome }}" name="{{ nome }}" type="text" value="{{ v or '' }}">{% endif %}
+{% endif %}
+</div>

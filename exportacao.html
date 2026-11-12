@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titulo %}Exportação{% endblock %}
+{% block conteudo %}
+<h1>Exportação e backup</h1>
+<div class="grade">
+<div class="card"><h2>Exportar dados</h2>
+  <p>Baixa um arquivo ZIP com planilhas (CSV) de pacientes, atendimentos, documentos, respostas das fichas, assinaturas e fotos (sem os arquivos de imagem).</p>
+  <p class="meta">Contém dados de saúde. Guarde com segurança.</p>
+  <form method="post" action="/exportacao/dados.zip"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn" type="submit">Baixar dados (ZIP)</button></form>
+</div>
+<div class="card"><h2>PDF dos documentos</h2><p>Abra um atendimento e use “Baixar PDF”. O PDF reúne as fichas e termos concluídos, com assinatura eletrônica e verificação de integridade.</p>
+  <a class="btn sec" href="/pacientes/">Ir para pacientes</a></div>
+</div>
+{% if g.user.papel == 'admin' %}
+<div class="card"><h2>Backup (banco de dados e fotos)</h2>
+  <form method="post" action="/exportacao/backup"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn" type="submit">Criar backup agora</button></form>
+  {% for b in backups %}<div class="linha-lista"><span>{{ b.nome }}</span><span class="meta">{{ b.kb }} KB</span></div>{% else %}<p class="meta">Nenhum backup ainda.</p>{% endfor %}
+  <p class="meta">Os backups ficam no servidor. Copie periodicamente para outro local (veja o guia de implantação).</p>
+</div>{% endif %}
+{% endblock %}

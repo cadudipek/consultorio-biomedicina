@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block titulo %}Antes e depois{% endblock %}
+{% block conteudo %}
+<div class="linha-topo"><h1>Antes e depois · {{ p.nome }}</h1><a class="btn sec" href="/pacientes/{{ p.id }}/fotos">Voltar às fotos</a></div>
+<div class="card"><div class="antes-depois">
+  <figure style="margin:0"><img src="/arquivos/{{ antes.id }}" alt="Foto anterior, {{ antes.data_registro|data }}"><figcaption><strong>Antes</strong> · {{ antes.data_registro|data }}<br><span class="meta">{{ antes.descricao or '' }}</span></figcaption></figure>
+  <figure style="margin:0"><img src="/arquivos/{{ depois.id }}" alt="Foto posterior, {{ depois.data_registro|data }}"><figcaption><strong>Depois</strong> · {{ depois.data_registro|data }}<br><span class="meta">{{ depois.descricao or '' }}</span></figcaption></figure>
+</div></div>
+{% endblock %}

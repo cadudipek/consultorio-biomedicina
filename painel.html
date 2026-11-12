@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titulo %}Pendências{% endblock %}
+{% block conteudo %}
+<h1>Pendências</h1>
+<div class="card"><h2>Atendimentos com documentação em aberto</h2>
+{% for a in aguardando %}
+<div class="linha-lista">
+  <div><a href="/atendimentos/{{ a.id }}"><strong>{{ a.paciente }}</strong></a> · {{ a.procedimento }} · {{ a.data_atendimento|data }}
+    <div style="margin-top:.3rem">
+      {% if a.fichas_pend %}<span class="tag pend">{{ a.fichas_pend }} ficha(s) incompleta(s)</span>{% endif %}
+      {% if a.termos_pend %}<span class="tag pend">{{ a.termos_pend }} termo(s) aguardando assinatura</span>{% endif %}
+      {% if a.a_conferir %}<span class="tag info">{{ a.a_conferir }} para conferir</span>{% endif %}
+    </div></div>
+  <a class="btn sec peq" href="/atendimentos/{{ a.id }}">Abrir</a>
+</div>
+{% else %}<div class="vazio">Nada pendente. Tudo em dia.</div>{% endfor %}
+</div>
+<div class="card"><h2>Documentação concluída (últimos)</h2>
+{% for a in concluidos %}
+<div class="linha-lista"><div><a href="/atendimentos/{{ a.id }}"><strong>{{ a.paciente }}</strong></a> · {{ a.procedimento }} · {{ a.data_atendimento|data }}</div><span class="tag">Concluído</span></div>
+{% else %}<div class="vazio">Nenhum atendimento concluído ainda.</div>{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block titulo %}{{ p.nome }}{% endblock %}
+{% block conteudo %}
+<div class="linha-topo"><h1>{{ p.nome }}</h1>
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+    <a class="btn sec" href="/pacientes/{{ p.id }}/editar">Editar dados</a>
+    {% if g.user.papel != 'assistente' %}<a class="btn sec" href="/pacientes/{{ p.id }}/fotos">Fotos</a>{% endif %}
+  </div>
+</div>
+{% if not p.ativo %}<div class="msg info">Este paciente está arquivado.</div>{% endif %}
+<div class="grade">
+<div class="card"><h2>Dados</h2>
+  <p class="meta" style="margin:0">CPF: {{ (p.cpf or '')|cpf or 'não informado' }}<br>
+  Nascimento: {{ p.data_nascimento|data or 'não informado' }}<br>
+  Telefone: {{ p.telefone or 'não informado' }}<br>
+  E-mail: {{ p.email or 'não informado' }}</p>
+  {% if p.observacoes %}<p>{{ p.observacoes }}</p>{% endif %}
+</div>
+<div class="card"><h2>Novo atendimento</h2>
+  <form method="get" action="/atendimentos/novo">
+    <input type="hidden" name="paciente" value="{{ p.id }}">
+    <label for="proc">Procedimento</label>
+    <select id="proc" name="procedimento" required>{% for pr in procs %}<option value="{{ pr.id }}">{{ pr.nome }}</option>{% endfor %}</select>
+    <div class="form-acoes"><button class="btn" type="submit">Abrir atendimento</button></div>
+  </form>
+</div>
+</div>
+<div class="card"><h2>Histórico de atendimentos</h2>
+  {% for a in atends %}
+  <div class="linha-lista">
+    <div><a href="/atendimentos/{{ a.id }}"><strong>{{ a.data_atendimento|data }} · {{ a.procedimento }}</strong></a>
+      <div class="meta">Documentos concluídos: {{ a.docs_ok }} de {{ a.total_docs }}</div></div>
+    <a class="btn sec peq" href="/atendimentos/{{ a.id }}">Abrir</a>
+  </div>
+  {% else %}<div class="vazio">Nenhum atendimento registrado.</div>{% endfor %}
+</div>
+{% if p.ativo and g.user.papel != 'assistente' %}
+<form method="post" action="/pacientes/{{ p.id }}/arquivar" onsubmit="return confirm('Arquivar este paciente? O histórico é mantido.')">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn perigo peq" type="submit">Arquivar paciente</button>
+</form>{% endif %}
+{% endblock %}

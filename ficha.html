@@ -1,0 +1,50 @@
+{% extends "publico/base.html" %}
+{% block titulo %}{{ d.nome }}{% endblock %}
+{% block conteudo %}
+<h1>{{ d.nome }}</h1>
+<div class="etapas" id="barra" aria-hidden="true"></div>
+<form method="post" id="form" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% for grupo in campos|batch(4) %}
+  <section class="card etapa" aria-label="Etapa {{ loop.index }} de {{ loop.length }}">
+    {% for c in grupo %}{% set nome = 'campo_' ~ c.id %}{% include "publico/_campo.html" %}{% endfor %}
+  </section>
+  {% endfor %}
+  <div id="erro-etapa" class="msg erro" style="display:none" role="alert">Preencha os campos marcados com * para continuar.</div>
+  <div class="form-acoes">
+    <button type="button" class="btn sec" id="voltar" style="display:none">Voltar</button>
+    <button type="button" class="btn" id="proximo" style="display:none">Continuar</button>
+    <button type="submit" class="btn" id="enviar">Enviar ficha</button>
+  </div>
+  <p class="ajuda">Campos com * são obrigatórios.</p>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  var etapas = Array.prototype.slice.call(document.querySelectorAll('.etapa'));
+  if (etapas.length < 2) return;
+  var i = 0, barra = document.getElementById('barra'), voltar = document.getElementById('voltar'),
+      prox = document.getElementById('proximo'), enviar = document.getElementById('enviar'), aviso = document.getElementById('erro-etapa');
+  etapas.forEach(function () { barra.appendChild(document.createElement('span')); });
+  function preenchido(campo) {
+    var marc = campo.querySelectorAll('input[type=radio],input[type=checkbox]');
+    if (marc.length) return Array.prototype.some.call(marc, function (m) { return m.checked; });
+    var el = campo.querySelector('input,textarea,select'); return !el || el.value.trim() !== '';
+  }
+  function ok() {
+    return Array.prototype.every.call(etapas[i].querySelectorAll('.campo-ficha'), function (c) { return c.dataset.obrig !== '1' || preenchido(c); });
+  }
+  function mostrar() {
+    etapas.forEach(function (e, k) { e.style.display = k === i ? '' : 'none'; });
+    Array.prototype.forEach.call(barra.children, function (b, k) { b.className = k <= i ? 'on' : ''; });
+    voltar.style.display = i > 0 ? '' : 'none'; prox.style.display = i < etapas.length - 1 ? '' : 'none';
+    enviar.style.display = i === etapas.length - 1 ? '' : 'none'; aviso.style.display = 'none'; window.scrollTo(0, 0);
+  }
+  prox.onclick = function () { if (!ok()) { aviso.style.display = ''; return; } i++; mostrar(); };
+  voltar.onclick = function () { i--; mostrar(); };
+  document.getElementById('form').addEventListener('submit', function (e) { if (!ok()) { e.preventDefault(); aviso.style.display = ''; } });
+  mostrar();
+})();
+</script>
+{% endblock %}

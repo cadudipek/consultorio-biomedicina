@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<title>{% block titulo %}Documentação{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body>
+<header class="topo"><div class="topo-in"><span class="marca">Consultório de Biomedicina</span></div></header>
+<main style="max-width:720px">
+{% with msgs = get_flashed_messages(with_categories=true) %}{% if msgs %}<ul class="msgs" role="status">{% for cat, m in msgs %}<li class="msg {{ cat }}">{{ m }}</li>{% endfor %}</ul>{% endif %}{% endwith %}
+{% block conteudo %}{% endblock %}
+</main>
+<div class="rodape">Suas informações são confidenciais e usadas apenas para o seu atendimento.</div>
+{% block scripts %}{% endblock %}
+</body></html>

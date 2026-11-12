@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block titulo %}Nova ficha{% endblock %}
+{% block conteudo %}
+<h1>Nova ficha</h1>
+<div class="card"><form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="n">Nome da ficha *</label><input id="n" name="nome" type="text" required>
+  <label for="d">Descrição</label><textarea id="d" name="descricao" style="min-height:70px"></textarea>
+  <div class="form-acoes"><button class="btn" type="submit">Criar e adicionar perguntas</button><a class="btn sec" href="/modelos/">Cancelar</a></div>
+</form></div>
+{% endblock %}

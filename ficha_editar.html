@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block titulo %}Editar ficha{% endblock %}
+{% block conteudo %}
+<h1>Ficha: {{ modelo.nome }}</h1>
+<p class="meta">Versão {{ versao.numero }}.
+{% if em_uso %}Esta versão já foi usada em atendimentos. Ao salvar, será criada a versão {{ versao.numero + 1 }}; os atendimentos anteriores mantêm as perguntas originais.{% else %}Ainda não foi usada em nenhum atendimento; as alterações valem para esta versão.{% endif %}</p>
+<form method="post" id="form-ficha">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="card">
+  <label for="n">Nome da ficha *</label><input id="n" name="nome" type="text" required value="{{ modelo.nome }}">
+  <label for="d">Descrição</label><textarea id="d" name="descricao" style="min-height:70px">{{ modelo.descricao or '' }}</textarea>
+</div>
+<div id="campos">
+{% for c in campos %}
+<div class="card campo">
+  <div class="cols2">
+    <div><label>Pergunta</label><input type="text" name="c{{ loop.index0 }}_rotulo" value="{{ c.rotulo }}"></div>
+    <div><label>Tipo de resposta</label><select name="c{{ loop.index0 }}_tipo">{% for k, v in tipos.items() %}<option value="{{ k }}" {{ 'selected' if c.tipo==k }}>{{ v }}</option>{% endfor %}</select></div>
+  </div>
+  <label>Opções (uma por linha; só para escolha única ou múltipla)</label><textarea name="c{{ loop.index0 }}_opcoes" style="min-height:70px">{{ c.opcoes }}</textarea>
+  <label>Texto de ajuda (opcional)</label><input type="text" name="c{{ loop.index0 }}_ajuda" value="{{ c.ajuda }}">
+  <label class="opcao"><input type="checkbox" name="c{{ loop.index0 }}_obrig" value="1" {{ 'checked' if c.obrigatorio }}><span>Resposta obrigatória</span></label>
+</div>
+{% endfor %}
+</div>
+<input type="hidden" name="n_campos" id="n_campos" value="{{ campos|length }}">
+<button type="button" class="btn sec" id="add">+ Adicionar pergunta</button>
+<p class="ajuda">Para remover uma pergunta, apague o texto dela e salve.</p>
+<div class="form-acoes"><button class="btn" type="submit">Salvar ficha</button><a class="btn sec" href="/modelos/">Voltar</a></div>
+</form>
+<template id="modelo-campo">
+<div class="card campo">
+  <div class="cols2">
+    <div><label>Pergunta</label><input type="text" name="c__I___rotulo"></div>
+    <div><label>Tipo de resposta</label><select name="c__I___tipo">{% for k, v in tipos.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select></div>
+  </div>
+  <label>Opções (uma por linha; só para escolha única ou múltipla)</label><textarea name="c__I___opcoes" style="min-height:70px"></textarea>
+  <label>Texto de ajuda (opcional)</label><input type="text" name="c__I___ajuda">
+  <label class="opcao"><input type="checkbox" name="c__I___obrig" value="1"><span>Resposta obrigatória</span></label>
+</div>
+</template>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('add').addEventListener('click', function () {
+  var n = document.getElementById('n_campos'), i = parseInt(n.value, 10);
+  var html = document.getElementById('modelo-campo').innerHTML.replace(/__I__/g, i);
+  document.getElementById('campos').insertAdjacentHTML('beforeend', html);
+  n.value = i + 1;
+  document.querySelector('#campos .campo:last-child input[type=text]').focus();
+});
+</script>
+{% endblock %}

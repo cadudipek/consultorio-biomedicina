@@ -1,0 +1,12 @@
+# NUNCA publicar dados reais
+instance/
+*.db
+*.sqlite*
+uploads/
+backups/
+*.tar.gz
+secret_key
+__pycache__/
+.pytest_cache/
+.venv/
+.env

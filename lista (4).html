@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block titulo %}Pacientes{% endblock %}
+{% block conteudo %}
+<div class="linha-topo"><h1>Pacientes</h1><a class="btn" href="/pacientes/novo">Novo paciente</a></div>
+<div class="card">
+  <form method="get" class="busca" role="search">
+    <div><label for="q">Buscar por nome ou CPF</label><input id="q" name="q" type="search" value="{{ termo }}" placeholder="Ex.: Maria"></div>
+    <div><label for="pr">Procedimento</label>
+      <select id="pr" name="procedimento"><option value="">Todos</option>
+      {% for p in procs %}<option value="{{ p.id }}" {{ 'selected' if proc==p.id }}>{{ p.nome }}</option>{% endfor %}</select></div>
+    <button class="btn" type="submit">Buscar</button>
+    {% if termo or proc or letra %}<a class="btn sec" href="/pacientes/">Limpar</a>{% endif %}
+  </form>
+  <nav class="letras" aria-label="Filtrar por letra inicial">
+    {% for l in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}<a href="?letra={{ l }}{% if proc %}&procedimento={{ proc }}{% endif %}" class="{{ 'ativo' if letra==l }}">{{ l }}</a>{% endfor %}
+  </nav>
+</div>
+<div class="card">
+  {% for p in pacientes %}
+  <div class="linha-lista">
+    <div><a href="/pacientes/{{ p.id }}"><strong>{{ p.nome }}</strong></a>
+      <div class="meta">{% if p.telefone %}{{ p.telefone }}{% else %}sem telefone{% endif %}</div></div>
+    <a class="btn sec peq" href="/pacientes/{{ p.id }}">Abrir ficha</a>
+  </div>
+  {% else %}<div class="vazio">Nenhum paciente encontrado.</div>{% endfor %}
+</div>
+{% endblock %}

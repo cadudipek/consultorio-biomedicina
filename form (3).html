@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Novo paciente' if novo else 'Editar paciente' }}{% endblock %}
+{% block conteudo %}
+<h1>{{ 'Novo paciente' if novo else 'Editar paciente' }}</h1>
+<div class="card">
+<form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="nome">Nome completo *</label>
+  <input id="nome" name="nome" type="text" required value="{{ p.get('nome') or '' }}" autocomplete="off">
+  <div class="cols2">
+    <div><label for="cpf">CPF</label><input id="cpf" name="cpf" type="text" inputmode="numeric" maxlength="14" value="{{ (p.get('cpf') or '')|cpf }}"></div>
+    <div><label for="nasc">Data de nascimento</label><input id="nasc" name="data_nascimento" type="date" value="{{ p.get('data_nascimento') or '' }}"></div>
+    <div><label for="tel">Telefone (WhatsApp)</label><input id="tel" name="telefone" type="tel" inputmode="tel" value="{{ p.get('telefone') or '' }}"></div>
+    <div><label for="email">E-mail</label><input id="email" name="email" type="email" value="{{ p.get('email') or '' }}"></div>
+  </div>
+  <label for="obs">Observações</label>
+  <textarea id="obs" name="observacoes">{{ p.get('observacoes') or '' }}</textarea>
+  <div class="form-acoes">
+    <button class="btn" type="submit">Salvar</button>
+    <a class="btn sec" href="{{ '/pacientes/' if novo else '/pacientes/' ~ pid }}">Cancelar</a>
+  </div>
+</form></div>
+{% endblock %}

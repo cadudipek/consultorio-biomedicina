@@ -1,0 +1,6 @@
+{% extends ("publico/base.html" if request.path.startswith('/p/') else "base.html") %}
+{% block titulo %}Erro {{ codigo }}{% endblock %}
+{% block conteudo %}
+<div class="card"><h1>{{ msg }}</h1><p class="meta">Código {{ codigo }}</p>
+{% if not request.path.startswith('/p/') %}<a class="btn" href="/">Voltar ao início</a>{% else %}<p>Peça à profissional que envie um novo link, se precisar.</p>{% endif %}</div>
+{% endblock %}
