@@ -3,6 +3,7 @@ name: Gerar instalador (Windows)
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   workflow_dispatch:
     inputs:
       versao:
@@ -45,13 +46,23 @@ jobs:
           --collect-data reportlab
           desktop.py
 
-      - name: Verificar que o executável inicia
+      - name: Verificar que o executável funciona
         shell: pwsh
         run: |
           $env:LOCALAPPDATA = "$PWD\smoke"
+          $env:CONSULTORIO_PORTA = "5099"
           $p = Start-Process dist\Consultorio\Consultorio.exe -ArgumentList "--demo" -PassThru
           Start-Sleep -Seconds 20
           if ($p.HasExited) { throw "O aplicativo fechou sozinho (código $($p.ExitCode))." }
+          foreach ($u in "entrar", "") {
+            $r = Invoke-WebRequest "http://127.0.0.1:5099/$u" -UseBasicParsing
+            if ($r.StatusCode -ne 200) { throw "/$u respondeu $($r.StatusCode)" }
+          }
+          # todas as rotas principais precisam existir (redirecionam para login = 200)
+          foreach ($u in "pacientes/", "procedimentos/", "exportacao/") {
+            $r = Invoke-WebRequest "http://127.0.0.1:5099/$u" -UseBasicParsing
+            if ($r.StatusCode -ne 200) { throw "/$u respondeu $($r.StatusCode)" }
+          }
           Stop-Process -Id $p.Id -Force
 
       - name: Criar o instalador
@@ -59,6 +70,7 @@ jobs:
         run: |
           choco install innosetup -y --no-progress
           $v = "${{ github.event.inputs.versao }}"
+          if (-not $v -and "${{ github.ref_type }}" -eq "tag") { $v = "${{ github.ref_name }}".TrimStart("v") }
           if (-not $v) { $v = "0.0.$env:GITHUB_RUN_NUMBER" }
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DAppVersion=$v" installer\consultorio.iss
           echo "VERSAO=$v" >> $env:GITHUB_ENV
@@ -69,7 +81,7 @@ jobs:
           path: dist-installer/*.exe
 
       - name: Publicar na página de Releases
-        if: ${{ github.event.inputs.versao != '' }}
+        if: ${{ github.event.inputs.versao != '' || github.ref_type == 'tag' }}
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
