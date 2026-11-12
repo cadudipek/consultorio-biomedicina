@@ -13,8 +13,9 @@
 </div>
 {% if g.user.papel == 'admin' %}
 <div class="card"><h2>Backup (banco de dados e fotos)</h2>
-  <form method="post" action="/exportacao/backup"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn" type="submit">Criar backup agora</button></form>
+  <form method="post" action="/exportacao/backup"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn sec" type="submit">Criar backup agora</button></form>
+  <form method="post" action="/exportacao/backup" style="margin-top:.5rem"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="baixar" value="1"><button class="btn" type="submit">Baixar backup (salvar em pendrive ou nuvem)</button></form>
   {% for b in backups %}<div class="linha-lista"><span>{{ b.nome }}</span><span class="meta">{{ b.kb }} KB</span></div>{% else %}<p class="meta">Nenhum backup ainda.</p>{% endfor %}
-  <p class="meta">Os backups ficam no servidor. Copie periodicamente para outro local (veja o guia de implantação).</p>
+  <p class="meta">Guarde uma cópia fora deste computador (pendrive, Google Drive) com frequência: se o computador quebrar, sem cópia os dados se perdem.</p>
 </div>{% endif %}
 {% endblock %}

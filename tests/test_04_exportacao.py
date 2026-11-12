@@ -61,3 +61,11 @@ def test_backup_so_admin(pro, app):
     pro.login("adm@demo.test")
     assert pro.post("/exportacao/backup").status_code == 302
     assert os.listdir(app.config["BACKUP_DIR"])
+
+
+def test_backup_para_download(pro):
+    pro.post("/sair")
+    pro.login("adm@demo.test")
+    r = pro.post("/exportacao/backup", {"baixar": "1"})
+    assert r.status_code == 200
+    assert "attachment" in r.headers["Content-Disposition"] and ".tar.gz" in r.headers["Content-Disposition"]

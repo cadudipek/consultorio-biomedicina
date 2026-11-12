@@ -47,6 +47,7 @@ def main():
     titulo = "Consultório (demonstração)" if demo else "Consultório"
     try:
         import webview
+        webview.settings["ALLOW_DOWNLOADS"] = True  # PDFs, exportação e backup
         webview.create_window(titulo, url, width=1200, height=820, min_size=(420, 600))
         webview.start()
     except Exception:  # sem WebView2: abre no navegador e mantém o servidor vivo

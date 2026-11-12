@@ -1,10 +1,11 @@
+import os
 import csv
 import io
 import json
 import zipfile
 from xml.sax.saxutils import escape
 
-from flask import Blueprint, abort, current_app, flash, g, redirect, render_template, send_file, url_for
+from flask import Blueprint, abort, current_app, flash, g, redirect, render_template, request, send_file, url_for
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -206,7 +207,9 @@ def dados_zip():
 @login_required("admin")
 def backup():
     caminho = fazer_backup(current_app)
-    auditar("backup", "sistema", None, {"arquivo": caminho.split("/")[-1]})
+    auditar("backup", "sistema", None, {"arquivo": os.path.basename(caminho)})
     commit()
-    flash("Backup criado na pasta de backups do servidor.", "ok")
+    if request.form.get("baixar"):  # cópia para o pendrive / outro local escolhido pela usuária
+        return send_file(caminho, mimetype="application/gzip", as_attachment=True, download_name=os.path.basename(caminho))
+    flash("Backup criado na pasta de backups do sistema.", "ok")
     return redirect(url_for("exportacao.pagina"))
