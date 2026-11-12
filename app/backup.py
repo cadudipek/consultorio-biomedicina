@@ -84,22 +84,26 @@ def restaurar(app, arquivo):
                     with tar.extractfile(m) as src, open(alvo, "wb") as dst:
                         shutil.copyfileobj(src, dst)
         novo_db = os.path.join(destino, "consultorio.db")
-        try:
-            c = sqlite3.connect(novo_db)
+        ok, tem_tabela = False, None
+        c = sqlite3.connect(novo_db)
+        try:  # no Windows, conexão aberta impede apagar o arquivo temporário: sempre fechar
             ok = c.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
             tem_tabela = c.execute("SELECT 1 FROM sqlite_master WHERE name='usuarios'").fetchone()
-            c.close()
         except sqlite3.DatabaseError:
-            ok, tem_tabela = False, None
+            pass
+        finally:
+            c.close()
         if not ok or not tem_tabela:
             raise BackupInvalido("O banco de dados dentro do backup está danificado.")
 
         # cópia de segurança do estado atual (se houver dados)
         if os.path.exists(app.config["DATABASE"]):
             c = sqlite3.connect(app.config["DATABASE"])
-            tem_dados = c.execute("SELECT 1 FROM sqlite_master WHERE name='usuarios'").fetchone() and \
-                c.execute("SELECT 1 FROM usuarios LIMIT 1").fetchone()
-            c.close()
+            try:
+                tem_dados = c.execute("SELECT 1 FROM sqlite_master WHERE name='usuarios'").fetchone() and \
+                    c.execute("SELECT 1 FROM usuarios LIMIT 1").fetchone()
+            finally:
+                c.close()
             if tem_dados:
                 fazer_backup(app)
 
