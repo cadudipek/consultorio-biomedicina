@@ -87,7 +87,8 @@ def detalhe(aid):
         wa = f"https://wa.me/{tel}?text={quote(msg)}"
     arquivos = q("SELECT COUNT(*) AS n FROM arquivos WHERE atendimento_id=?", (aid,))[0]["n"] if g.user["papel"] != "assistente" else 0
     return render_template("atendimentos/detalhe.html", a=a, docs=docs, links=links, agora=agora, novo_link=novo_link, wa=wa,
-                           n_arquivos=arquivos, validade=current_app.config["LINK_VALIDADE_HORAS"])
+                           n_arquivos=arquivos, validade=current_app.config["LINK_VALIDADE_HORAS"],
+                           link_remoto=current_app.config.get("LINK_REMOTO", True))
 
 
 @bp.route("/<int:aid>/editar", methods=["POST"])
@@ -131,6 +132,28 @@ def criar_link(aid):
     from . import _fmt_dt
     session["novo_link"] = {"url": f"{base}/p/{token}", "expira": _fmt_dt(expira)}
     return redirect(url_for("atendimentos.detalhe", aid=aid))
+
+
+@bp.route("/<int:aid>/presencial", methods=["POST"])
+@login_required()
+def presencial(aid):
+    """Assinatura com a paciente presente: abre a tela da paciente neste aparelho (link curto, 2 horas)."""
+    _atendimento(aid)
+    pend = q1("SELECT 1 FROM atendimento_documentos WHERE atendimento_id=? AND status='pendente'", (aid,))
+    if not pend:
+        flash("Não há documentos pendentes para a paciente.", "info")
+        return redirect(url_for("atendimentos.detalhe", aid=aid))
+    token = secrets.token_urlsafe(32)
+    expira = (datetime.now(timezone.utc) + timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S")
+    lid = run("INSERT INTO links_acesso (atendimento_id,token_hash,expira_em,criado_por) VALUES (?,?,?,?)",
+              (aid, hashlib.sha256(token.encode()).hexdigest(), expira, g.user["id"]))
+    auditar("criar_link_presencial", "links_acesso", lid, {"atendimento": aid})
+    commit()
+    session["presencial_aid"] = aid
+    did = request.form.get("doc", type=int)
+    if did and q1("SELECT 1 FROM atendimento_documentos WHERE id=? AND atendimento_id=? AND tipo='termo' AND status='pendente'", (did, aid)):
+        return redirect(url_for("publico.termo", token=token, did=did))
+    return redirect(url_for("publico.inicio", token=token))
 
 
 @bp.route("/<int:aid>/links/<int:lid>/revogar", methods=["POST"])
