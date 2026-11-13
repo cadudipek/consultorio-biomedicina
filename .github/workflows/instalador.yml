@@ -89,6 +89,13 @@ jobs:
           Write-Host "atendimento -> $dest"
           if ($dest -notmatch "^/atendimentos/(\d+)$") { throw "Atendimento não foi aberto (parou em $dest)" }
           $aid = $Matches[1]
+          # preenche a ficha (radio = "Não", texto = "Não") para haver um documento concluído
+          $d = Invoke-WebRequest "$B/atendimentos/$aid/documentos/1" -WebSession $s -UseBasicParsing
+          $body = @{ csrf_token = (Tok $d) }
+          foreach ($m in [regex]::Matches($d.Content, '<input type="radio" name="(campo_\d+)"')) { $body[$m.Groups[1].Value] = "Não" }
+          foreach ($m in [regex]::Matches($d.Content, '<textarea[^>]*name="(campo_\d+)"')) { $body[$m.Groups[1].Value] = "Não" }
+          $r = Invoke-WebRequest "$B/atendimentos/$aid/documentos/1" -Method Post -WebSession $s -UseBasicParsing -Body $body
+          if ($r.Content -notmatch "Integridade verificada") { throw "Ficha não foi salva" }
           $pdf = Invoke-WebRequest "$B/atendimentos/$aid/pdf" -WebSession $s -UseBasicParsing
           if ($pdf.Headers["Content-Type"] -notlike "application/pdf*") { throw "PDF não foi gerado" }
           $pg = Invoke-WebRequest "$B/exportacao/" -WebSession $s -UseBasicParsing
