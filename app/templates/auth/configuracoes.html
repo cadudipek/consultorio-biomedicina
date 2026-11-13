@@ -23,7 +23,7 @@
     <label for="ue">E-mail</label><input id="ue" name="email" type="email" required>
     <label for="up">Papel</label>
     <select id="up" name="papel">
-      <option value="assistente">Assistente (cadastro e envio de links)</option>
+      <option value="assistente">Assistente (cadastra pacientes e entrega documentos; não vê fotos nem prontuário)</option>
       <option value="profissional">Profissional (acesso clínico completo)</option>
       <option value="admin">Administrador</option>
     </select>
@@ -42,4 +42,5 @@
 <td>{% if u.id != g.user.id %}<form method="post" action="/configuracoes/usuarios/{{ u.id }}/alternar"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn sec peq" type="submit">{{ 'Desativar' if u.ativo else 'Reativar' }}</button></form>{% endif %}</td></tr>{% endfor %}
 </table></div></div>
 {% endif %}
+<p class="meta" style="margin-top:1rem">Versão do sistema: {{ VERSAO }}</p>
 {% endblock %}

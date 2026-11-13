@@ -1,7 +1,7 @@
 {% extends "publico/base.html" %}
 {% block conteudo %}
 <h1>Olá, {{ primeiro_nome }}!</h1>
-<p>Para o seu atendimento de <strong>{{ a.procedimento }}</strong>, preencha os documentos abaixo. Leva poucos minutos e você pode fazer pelo celular.</p>
+<p>Para o seu atendimento de <strong>{{ a.procedimento }}</strong>, preencha os documentos abaixo. {% if presencial_aid == a.id %}Toque em cada um, na ordem.{% else %}Leva poucos minutos e você pode fazer pelo celular.{% endif %}</p>
 <div class="card">
 {% for d in docs %}
   <div class="linha-lista">
@@ -13,5 +13,5 @@
 {% endfor %}
 </div>
 {% if pendentes == 0 %}<div class="msg ok">Tudo pronto. Obrigado! Você já pode fechar esta página.</div>{% endif %}
-{% if g.user and presencial_aid == a.id %}<p><a class="btn sec" href="/atendimentos/{{ a.id }}">Concluir e voltar ao sistema (profissional)</a></p>{% endif %}
+{% if g.user and presencial_aid == a.id %}<p><a class="btn sec" href="/atendimentos/{{ a.id }}">Concluir e devolver à profissional</a></p>{% endif %}
 {% endblock %}

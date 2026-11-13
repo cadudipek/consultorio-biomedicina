@@ -1,21 +1,32 @@
 {% extends "base.html" %}
-{% block titulo %}Exportação{% endblock %}
+{% block titulo %}Backup{% endblock %}
 {% block conteudo %}
-<h1>Exportação e backup</h1>
-<div class="grade">
-<div class="card"><h2>Exportar dados</h2>
-  <p>Baixa um arquivo ZIP com planilhas (CSV) de pacientes, atendimentos, documentos, respostas das fichas, assinaturas e fotos (sem os arquivos de imagem).</p>
-  <p class="meta">Contém dados de saúde. Guarde com segurança.</p>
-  <form method="post" action="/exportacao/dados.zip"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn" type="submit">Baixar dados (ZIP)</button></form>
-</div>
-<div class="card"><h2>PDF dos documentos</h2><p>Abra um atendimento e use “Baixar PDF”. O PDF reúne as fichas e termos concluídos, com assinatura eletrônica e verificação de integridade.</p>
-  <a class="btn sec" href="/pacientes/">Ir para pacientes</a></div>
-</div>
+<h1>Backup e exportação</h1>
 {% if g.user.papel == 'admin' %}
-<div class="card"><h2>Backup (banco de dados e fotos)</h2>
-  <form method="post" action="/exportacao/backup"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn sec" type="submit">Criar backup agora</button></form>
-  <form method="post" action="/exportacao/backup" style="margin-top:.5rem"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="baixar" value="1"><button class="btn" type="submit">Baixar backup (salvar em pendrive ou nuvem)</button></form>
-  {% for b in backups %}<div class="linha-lista"><span>{{ b.nome }}</span><span class="meta">{{ b.kb }} KB</span></div>{% else %}<p class="meta">Nenhum backup ainda.</p>{% endfor %}
-  <p class="meta">Guarde uma cópia fora deste computador (pendrive, Google Drive) com frequência: se o computador quebrar, sem cópia os dados se perdem.</p>
-</div>{% endif %}
+<div class="card destaque"><h2>Cópia de segurança (backup)</h2>
+  <p>Guarda <strong>tudo</strong> (pacientes, fichas, termos assinados e fotos) num único arquivo. Salve num <strong>pendrive</strong> ou no <strong>Google Drive</strong>, pelo menos uma vez por semana.</p>
+  <form method="post" action="/exportacao/backup"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="baixar" value="1">
+    <button class="btn" type="submit">Salvar cópia de segurança</button></form>
+  <p class="ajuda">Vai abrir a janela para escolher onde salvar. Uma cópia também fica guardada neste computador.</p>
+  {% if backups %}<details style="margin-top:.75rem"><summary>Cópias guardadas neste computador ({{ backups|length }})</summary>
+  {% for b in backups %}<div class="linha-lista"><span>{{ b.nome }}</span><span class="meta">{{ b.kb }} KB</span></div>{% endfor %}</details>{% endif %}
+</div>
+<div class="card"><h2>Recuperar um backup</h2>
+  <p>Use se trocou de computador ou precisa voltar os dados de uma cópia. <strong>Os dados atuais serão substituídos</strong> (antes disso, o sistema guarda uma cópia deles automaticamente).</p>
+  <form method="post" action="/exportacao/restaurar" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="arq">Arquivo de backup (.tar.gz)</label><input id="arq" name="arquivo" type="file" accept=".gz,.tar.gz" required>
+    <label class="opcao"><input type="checkbox" name="confirmo" value="1" required> Entendo que os dados atuais serão substituídos pelos do backup.</label>
+    <div class="form-acoes"><button class="btn perigo" type="submit">Recuperar backup</button></div>
+  </form>
+</div>
+{% endif %}
+<div class="grade">
+<div class="card"><h2>PDF dos documentos</h2><p>Abra um atendimento e use “Baixar PDF”. O PDF reúne fichas e termos concluídos, com a assinatura eletrônica.</p>
+  <a class="btn sec" href="/pacientes/">Ir para pacientes</a></div>
+<div class="card"><h2>Planilhas (para contador ou outro sistema)</h2>
+  <p>Arquivo ZIP com planilhas de pacientes, atendimentos, respostas e assinaturas. Não serve para recuperar o sistema: para isso use o backup.</p>
+  <form method="post" action="/exportacao/dados.zip"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn sec" type="submit">Baixar planilhas (ZIP)</button></form>
+</div>
+</div>
 {% endblock %}

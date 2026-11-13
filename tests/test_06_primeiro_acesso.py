@@ -3,6 +3,8 @@ from app import db as dbmod
 
 
 def _app(tmp_path):
+    import os
+    os.makedirs(tmp_path, exist_ok=True)
     app = create_app({"TESTING": True, "PRIMEIRO_ACESSO": True, "DATABASE": str(tmp_path / "t.db"),
                       "UPLOAD_DIR": str(tmp_path / "up"), "BACKUP_DIR": str(tmp_path / "bk"), "SECRET_KEY": "x"})
     with app.app_context():

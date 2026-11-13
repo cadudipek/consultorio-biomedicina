@@ -47,7 +47,7 @@ def _exigir_primeiro_acesso():
 
     if not current_app.config.get("PRIMEIRO_ACESSO"):
         return None
-    if request.endpoint in ("auth.primeiro_acesso", "static"):
+    if request.endpoint in ("auth.primeiro_acesso", "auth.primeiro_acesso_restaurar", "static"):
         return None
     if dbmod.q1("SELECT 1 FROM usuarios LIMIT 1") is None:
         return redirect(url_for("auth.primeiro_acesso"))
@@ -82,13 +82,16 @@ def create_app(config=None):
     if os.environ.get("TRUST_PROXY") == "1":  # atrás de nginx/PaaS: usa o IP e o HTTPS reais
         from werkzeug.middleware.proxy_fix import ProxyFix
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
+    app.config.setdefault("DEMO", os.environ.get("DEMO") == "1")
     app.config.setdefault("PUBLIC_BASE_URL", os.environ.get("PUBLIC_BASE_URL", ""))
 
     app.teardown_appcontext(dbmod.close_db)
     app.before_request(_exigir_primeiro_acesso)
     app.before_request(carregar_usuario)
     app.before_request(verificar_csrf)
+    from .versao import VERSAO
     app.jinja_env.globals["csrf_token"] = csrf_token
+    app.jinja_env.globals["VERSAO"] = VERSAO
     app.jinja_env.filters["dt"] = _fmt_dt
     app.jinja_env.filters["data"] = _fmt_data
     app.jinja_env.filters["cpf"] = _fmt_cpf

@@ -9,10 +9,16 @@ Arquitetura, justificativa técnica e custos: `docs/ARQUITETURA.md`. Modelo do b
 
 ## Instalação no Windows (recomendada)
 
-Baixe o instalador `Consultorio-Setup-*.exe` na página **Releases** deste repositório, execute e siga o assistente.
-O aplicativo abre em janela própria; no primeiro uso pede nome, e-mail e senha. Os dados ficam em
-`%LOCALAPPDATA%\Consultorio` e **não** são apagados ao desinstalar. Para testar com dados fictícios, use o
-atalho "Consultório (demonstração)". O instalador é gerado automaticamente por `.github/workflows/instalador.yml`.
+**Página de download:** https://cadudipek.github.io/consultorio-biomedicina/
+
+Link direto (sempre a versão mais nova):
+https://github.com/cadudipek/consultorio-biomedicina/releases/latest/download/Consultorio-Setup.exe
+
+O aplicativo abre em janela própria. No primeiro uso pede nome, e-mail e senha, ou recupera um backup de outro
+computador. Ao iniciar, oferece "modelos prontos" (ficha de anamnese, termo de consentimento, autorização de imagem
+e um procedimento) para a profissional revisar. Os dados ficam em `%LOCALAPPDATA%\Consultorio` e **não** são
+apagados ao desinstalar. Atualizações: o app avisa quando há versão nova; basta instalar por cima.
+O instalador e a página são gerados automaticamente (`.github/workflows/`).
 
 ## Rodar no seu computador (demonstração)
 

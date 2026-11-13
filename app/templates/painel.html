@@ -1,7 +1,26 @@
 {% extends "base.html" %}
-{% block titulo %}Pendências{% endblock %}
+{% block titulo %}Início{% endblock %}
 {% block conteudo %}
-<h1>Pendências</h1>
+<h1>Olá{{ ", " ~ primeiro_nome if primeiro_nome }}!</h1>
+{% if mostrar_passos %}
+<div class="card destaque"><h2>Primeiros passos</h2>
+  <p class="meta">Siga na ordem. Cada item fica marcado quando estiver feito.</p>
+  <ol class="passos">{% for t, feito, url in passos %}
+    <li class="{{ 'feito' if feito }}"><span class="check" aria-hidden="true">{{ '✓' if feito else loop.index }}</span>
+      {% if feito %}<span>{{ t }}</span>{% else %}<a href="{{ url }}">{{ t }}</a>{% endif %}</li>{% endfor %}</ol>
+  {% if sem_modelos and g.user.papel != 'assistente' %}
+  <form method="post" action="/modelos-iniciais" class="form-acoes"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn" type="submit">Começar com modelos prontos</button>
+    <span class="ajuda" style="align-self:center">Cria uma ficha de anamnese, o termo de consentimento, a autorização de imagem e um procedimento. Você revisa e ajusta os textos depois.</span></form>
+  {% endif %}
+</div>{% endif %}
+{% if lembrar_backup %}
+<div class="msg info" role="status"><strong>Faça uma cópia de segurança.</strong>
+  {% if ultimo_backup %}A última foi em {{ ultimo_backup|dt }}.{% else %}Você ainda não fez nenhuma.{% endif %}
+  Se este computador quebrar, sem cópia os dados se perdem.
+  {% if g.user.papel == 'admin' %}<a href="/exportacao/">Fazer backup agora</a>{% endif %}</div>
+{% endif %}
+<h2 style="margin-top:1.5rem">Pendências</h2>
 <div class="card"><h2>Atendimentos com documentação em aberto</h2>
 {% for a in aguardando %}
 <div class="linha-lista">
@@ -13,7 +32,7 @@
     </div></div>
   <a class="btn sec peq" href="/atendimentos/{{ a.id }}">Abrir</a>
 </div>
-{% else %}<div class="vazio">Nada pendente. Tudo em dia.</div>{% endfor %}
+{% else %}<div class="vazio">Nada pendente. Tudo em dia.<br><a href="/pacientes/">Ir para pacientes</a> para abrir um atendimento.</div>{% endfor %}
 </div>
 <div class="card"><h2>Documentação concluída (últimos)</h2>
 {% for a in concluidos %}

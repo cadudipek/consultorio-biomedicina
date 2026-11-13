@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Consultório · Download</title>
+<meta name="description" content="Sistema de pacientes, fichas de anamnese e termos assinados para consultório. Instalação para Windows.">
+<link rel="icon" href="icone.png">
+<style>
+:root{--verde:#1f6f5c;--esc:#16584a;--claro:#e3f1ed;--txt:#1d2b27;--suave:#5a6b66;--linha:#dbe3e0;--bg:#f5f7f6}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.6;font-size:17px}
+header{background:var(--verde);color:#fff;padding:2.5rem 1rem 3rem;text-align:center}
+header img{width:72px;height:72px}h1{margin:.5rem 0 .25rem;font-size:2rem}header p{margin:0;opacity:.92;font-size:1.1rem}
+main{max-width:760px;margin:-1.75rem auto 3rem;padding:0 16px}
+.card{background:#fff;border:1px solid var(--linha);border-radius:14px;padding:1.5rem;margin-bottom:1rem}
+.baixar{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.6rem}
+.btn{display:inline-flex;align-items:center;gap:.6rem;background:var(--verde);color:#fff;text-decoration:none;font-weight:700;font-size:1.25rem;padding:1rem 2rem;border-radius:12px;min-height:56px}
+.btn:hover{background:var(--esc)}.btn:focus-visible{outline:3px solid #f0a500;outline-offset:3px}
+.meta{color:var(--suave);font-size:.95rem}
+ol.passos{list-style:none;counter-reset:p;padding:0;margin:0}
+ol.passos>li{counter-increment:p;display:grid;grid-template-columns:44px 1fr;gap:.9rem;padding:1rem 0;border-bottom:1px solid var(--linha)}
+ol.passos>li:last-child{border-bottom:0}
+ol.passos>li::before{content:counter(p);width:40px;height:40px;border-radius:50%;background:var(--claro);color:var(--esc);font-weight:800;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+h2{font-size:1.3rem;margin:0 0 .75rem}h3{margin:0 0 .2rem;font-size:1.05rem}
+.aviso{background:#e8f0fb;border:1px solid #a9c4ea;border-radius:10px;padding:.8rem 1rem;margin-top:.6rem;font-size:.95rem}
+.win{display:inline-block;background:#0067c0;color:#fff;border-radius:4px;padding:0 .4rem;font-size:.9rem;white-space:nowrap}
+kbd{background:#eef2f0;border:1px solid var(--linha);border-radius:4px;padding:0 .35rem;font-size:.9rem}
+details{border-top:1px solid var(--linha);padding:.75rem 0}details:first-of-type{border-top:0}summary{cursor:pointer;font-weight:600}
+footer{text-align:center;color:var(--suave);font-size:.85rem;padding:0 16px 2rem}
+</style>
+</head>
+<body>
+<header>
+  <img src="icone.png" alt="">
+  <h1>Consultório</h1>
+  <p>Pacientes, fichas de anamnese e termos assinados, num só lugar.</p>
+</header>
+<main>
+  <section class="card baixar">
+    <a class="btn" id="baixar" href="https://github.com/cadudipek/consultorio-biomedicina/releases/latest/download/Consultorio-Setup.exe">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 20h16"/></svg>
+      Baixar para Windows</a>
+    <span class="meta">Windows 10 ou 11 · cerca de 20 MB · gratuito · <span id="ver">versão mais recente</span></span>
+  </section>
+
+  <section class="card">
+    <h2>Como instalar (3 passos)</h2>
+    <ol class="passos">
+      <li><div><h3>Abra o arquivo baixado</h3>
+        Clique em <strong>Consultorio-Setup.exe</strong> na barra de downloads do navegador (ou na pasta <em>Downloads</em>).</div></li>
+      <li><div><h3>Se aparecer a tela azul “O Windows protegeu o computador”</h3>
+        Clique em <strong>Mais informações</strong> e depois em <span class="win">Executar assim mesmo</span>.
+        <div class="aviso">Esse aviso aparece com programas novos que ainda não têm um certificado pago. É esperado e não indica problema.</div></div></li>
+      <li><div><h3>Clique em “Avançar” até terminar</h3>
+        O programa abre sozinho. No primeiro uso, ele pede o seu <strong>nome, e-mail e uma senha</strong>. Pronto!</div></li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>Dúvidas comuns</h2>
+    <details><summary>Onde ficam os dados dos pacientes?</summary>
+      <p>Somente no seu computador. Nada é enviado para a internet. Por isso, use o menu <strong>Backup</strong> e salve uma cópia num pendrive ou no Google Drive toda semana.</p></details>
+    <details><summary>Troquei de computador. Como recupero tudo?</summary>
+      <p>Instale o programa no computador novo e, na primeira tela, use <strong>“Já usava o sistema em outro computador?”</strong> com o seu arquivo de backup.</p></details>
+    <details><summary>Como atualizo?</summary>
+      <p>Quando houver versão nova, o próprio programa mostra um aviso. Baixe por este mesmo botão e instale por cima: os dados continuam guardados.</p></details>
+    <details><summary>Quero só experimentar antes</summary>
+      <p>Durante a instalação, marque “Criar também o atalho de DEMONSTRAÇÃO”. Ele abre uma cópia separada com pacientes fictícios (entrar com <kbd>demo@exemplo.test</kbd> e senha <kbd>demonstracao-123</kbd>).</p></details>
+    <details><summary>Desinstalar apaga meus dados?</summary>
+      <p>Não. Os dados ficam guardados mesmo se o programa for removido.</p></details>
+  </section>
+</main>
+<footer>Projeto de extensão — Tecnologia em Banco de Dados (UNINTER). <a href="https://github.com/cadudipek/consultorio-biomedicina">Código-fonte</a></footer>
+<script>
+fetch('https://api.github.com/repos/cadudipek/consultorio-biomedicina/releases/latest')
+  .then(function(r){return r.ok?r.json():null}).then(function(j){if(j&&j.tag_name)document.getElementById('ver').textContent='versão '+j.tag_name.replace(/^v/,'');}).catch(function(){});
+</script>
+</body>
+</html>

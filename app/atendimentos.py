@@ -52,7 +52,7 @@ def novo():
             run("INSERT INTO atendimento_documentos (atendimento_id,tipo,termo_versao_id) VALUES (?,'termo',?)", (aid, t["versao_id"]))
         auditar("criar", "atendimentos", aid, {"paciente": pid, "procedimento": proc_id, "documentos": len(fichas) + len(termos)})
         commit()
-        flash("Atendimento aberto. Agora você pode enviar o link ao paciente.", "ok")
+        flash("Atendimento aberto. Próximo passo: a paciente preencher e assinar os documentos." if not current_app.config.get("LINK_REMOTO", True) else "Atendimento aberto. Agora você pode enviar o link ao paciente.", "ok")
         return redirect(url_for("atendimentos.detalhe", aid=aid))
     return render_template("atendimentos/novo.html", paciente=paciente, proc=proc, fichas=fichas, termos=termos, hoje=hoje_local())
 

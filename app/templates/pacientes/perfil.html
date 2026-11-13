@@ -17,12 +17,14 @@
   {% if p.observacoes %}<p>{{ p.observacoes }}</p>{% endif %}
 </div>
 <div class="card"><h2>Novo atendimento</h2>
+  {% if not procs %}<p class="meta">Antes de abrir um atendimento, cadastre pelo menos um procedimento.</p>
+  <a class="btn sec" href="/procedimentos/novo">Cadastrar procedimento</a>{% else %}
   <form method="get" action="/atendimentos/novo">
     <input type="hidden" name="paciente" value="{{ p.id }}">
     <label for="proc">Procedimento</label>
     <select id="proc" name="procedimento" required>{% for pr in procs %}<option value="{{ pr.id }}">{{ pr.nome }}</option>{% endfor %}</select>
     <div class="form-acoes"><button class="btn" type="submit">Abrir atendimento</button></div>
-  </form>
+  </form>{% endif %}
 </div>
 </div>
 <div class="card"><h2>Histórico de atendimentos</h2>

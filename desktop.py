@@ -19,18 +19,46 @@ def porta_livre():
         return s.getsockname()[1]
 
 
+REPO = "cadudipek/consultorio-biomedicina"
+DOWNLOAD = f"https://github.com/{REPO}/releases/latest/download/Consultorio-Setup.exe"
+
+
+def _tupla(v):
+    try:
+        return tuple(int(x) for x in v.lstrip("v").split("."))
+    except ValueError:
+        return (0,)
+
+
+def verificar_atualizacao(app):
+    """Consulta a última versão publicada; se for mais nova, o app mostra um aviso com o link de download."""
+    import json
+    from app.versao import VERSAO
+    try:
+        req = urllib.request.Request(f"https://api.github.com/repos/{REPO}/releases/latest",
+                                     headers={"User-Agent": "Consultorio", "Accept": "application/vnd.github+json"})
+        with urllib.request.urlopen(req, timeout=8) as r:
+            ultima = json.load(r).get("tag_name", "")
+        if _tupla(ultima) > _tupla(VERSAO) and VERSAO != "0.0.0":
+            app.config["NOVA_VERSAO"] = {"versao": ultima.lstrip("v"), "url": DOWNLOAD}
+    except Exception:
+        pass  # sem internet: segue normalmente
+
+
 def main():
     demo = "--demo" in sys.argv
     os.environ["CONSULTORIO_DATA"] = pasta_dados(demo)
     from app import create_app
     from app import db as dbmod
 
-    app = create_app({"PRIMEIRO_ACESSO": not demo, "LINK_REMOTO": False})
+    app = create_app({"PRIMEIRO_ACESSO": not demo, "LINK_REMOTO": False, "DEMO": demo})
     with app.app_context():
         dbmod.init_db()
         if demo and dbmod.q1("SELECT 1 FROM usuarios LIMIT 1") is None:
             from app.seed import carregar
             carregar()
+
+    threading.Thread(target=verificar_atualizacao, args=(app,), daemon=True).start()
 
     porta = int(os.environ.get("CONSULTORIO_PORTA") or porta_livre())
     url = f"http://127.0.0.1:{porta}/"
