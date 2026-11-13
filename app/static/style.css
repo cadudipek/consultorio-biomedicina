@@ -67,7 +67,13 @@ th{font-size:.85rem;color:var(--suave);text-transform:none}
 canvas.assin{width:100%;height:180px;border:2px dashed #9fb0aa;border-radius:10px;touch-action:none;background:#fff}
 .sr{position:absolute;left:-9999px}
 .rodape{max-width:1100px;margin:0 auto;padding:0 1rem 2rem;color:var(--suave);font-size:.85rem}
-@media print{.topo,.btn,.nav,.rodape{display:none}}
+@media print{.topo,.btn,.nav,.rodape,.nao-imprimir,.aviso-demo{display:none!important} body{background:#fff} .folha{border:0!important;box-shadow:none!important;padding:0!important;max-width:none!important}}
+.folha{background:#fff;border:1px solid var(--linha);border-radius:10px;padding:1.5rem 2rem;max-width:800px;margin:0 auto;color:#000}
+.folha h1{font-size:1.4rem;margin:0 0 .2rem} .folha .cab{display:grid;grid-template-columns:2fr 1fr;gap:.5rem 1.5rem;margin:1rem 0 1.2rem}
+.linha-em-branco{border-bottom:1px solid #000;min-height:1.6rem} .rot{font-size:.8rem;color:#333}
+.pergunta{margin:0 0 .9rem;break-inside:avoid} .pergunta b{display:block;margin-bottom:.15rem}
+.opcoes-imp{display:flex;flex-wrap:wrap;gap:.3rem 1.2rem} .caixa{display:inline-block;width:.85em;height:.85em;border:1px solid #000;margin-right:.3em;vertical-align:-1px}
+.folha .termo-texto{max-height:none;border:0;padding:0;background:#fff} .assin-em-branco{margin-top:2.5rem;display:grid;grid-template-columns:2fr 1fr;gap:1.5rem}
 
 .destaque{border-color:#9ccfc1;background:#f4fbf8}
 .passos{list-style:none;padding:0;margin:.5rem 0 0}

@@ -236,3 +236,17 @@ CREATE TRIGGER IF NOT EXISTS trg_adendo_no_update BEFORE UPDATE ON adendos
 BEGIN SELECT RAISE(ABORT, 'adendo é imutável'); END;
 CREATE TRIGGER IF NOT EXISTS trg_adendo_no_delete BEFORE DELETE ON adendos
 BEGIN SELECT RAISE(ABORT, 'adendo é imutável'); END;
+
+-- ---------- Biblioteca de modelos (arquivos enviados pela profissional) ----------
+CREATE TABLE IF NOT EXISTS biblioteca (
+    id            INTEGER PRIMARY KEY,
+    titulo        TEXT NOT NULL,
+    categoria     TEXT NOT NULL DEFAULT 'ficha',   -- ficha | termo | outro
+    nome_original TEXT NOT NULL,
+    caminho       TEXT NOT NULL,
+    mime          TEXT NOT NULL,
+    tamanho       INTEGER NOT NULL,
+    sha256        TEXT NOT NULL,
+    ativo         INTEGER NOT NULL DEFAULT 1,
+    criado_em     TEXT NOT NULL DEFAULT (datetime('now'))
+);

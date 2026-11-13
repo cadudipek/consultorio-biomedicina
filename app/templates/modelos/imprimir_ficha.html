@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titulo %}Imprimir ficha em branco{% endblock %}
+{% block conteudo %}
+<div class="nao-imprimir linha-topo" style="margin-bottom:1rem">
+  <a class="btn sec" href="/modelos/">← Voltar</a>
+  <button class="btn" onclick="window.print()">Imprimir</button>
+</div>
+<div class="folha">
+  <h1>{{ modelo.nome }}</h1>
+  {% if modelo.descricao %}<div class="rot">{{ modelo.descricao }}</div>{% endif %}
+  <div class="cab">
+    <div><div class="linha-em-branco"></div><div class="rot">Nome da paciente</div></div>
+    <div><div class="linha-em-branco"></div><div class="rot">Data</div></div>
+    <div><div class="linha-em-branco"></div><div class="rot">CPF</div></div>
+    <div><div class="linha-em-branco"></div><div class="rot">Telefone</div></div>
+  </div>
+  {% for c in campos %}
+  <div class="pergunta"><b>{{ loop.index }}. {{ c.rotulo }}{% if c.obrigatorio %} *{% endif %}</b>
+    {% if c.ajuda %}<div class="rot">{{ c.ajuda }}</div>{% endif %}
+    {% if c.tipo == 'sim_nao' %}<div class="opcoes-imp"><span><i class="caixa"></i>Sim</span><span><i class="caixa"></i>Não</span></div>
+    {% elif c.tipo in ('escolha_unica','multipla_escolha') %}<div class="opcoes-imp">{% for o in c.lista %}<span><i class="caixa"></i>{{ o }}</span>{% endfor %}</div>
+    {% elif c.tipo == 'data' %}<div>____ / ____ / ________</div>
+    {% elif c.tipo == 'texto_longo' %}<div class="linha-em-branco"></div><div class="linha-em-branco"></div><div class="linha-em-branco"></div>
+    {% else %}<div class="linha-em-branco"></div>{% endif %}
+  </div>
+  {% else %}<div class="vazio">Esta ficha ainda não tem perguntas.</div>{% endfor %}
+  <div class="assin-em-branco">
+    <div><div class="linha-em-branco"></div><div class="rot">Assinatura da paciente</div></div>
+    <div><div class="linha-em-branco"></div><div class="rot">Data</div></div>
+  </div>
+  <div class="rot" style="margin-top:1rem">Modelo: {{ modelo.nome }} · versão {{ versao.numero }}</div>
+</div>
+{% endblock %}

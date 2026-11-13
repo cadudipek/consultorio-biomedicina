@@ -105,10 +105,10 @@ def create_app(config=None):
         return resp
 
     # Importações explícitas (o empacotador do instalador precisa enxergá-las)
-    from . import (arquivos, atendimentos, auth, exportacao, modelos, painel, pacientes,
+    from . import (arquivos, atendimentos, auth, biblioteca, exportacao, modelos, painel, pacientes,
                    procedimentos, publico)
 
-    for mod in (auth, pacientes, procedimentos, modelos, atendimentos, publico, arquivos, painel, exportacao):
+    for mod in (auth, pacientes, procedimentos, modelos, atendimentos, publico, arquivos, painel, exportacao, biblioteca):
         app.register_blueprint(mod.bp)
 
     @app.errorhandler(403)

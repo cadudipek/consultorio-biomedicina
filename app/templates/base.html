@@ -15,6 +15,7 @@
     <a href="/pacientes/" class="{{ 'ativo' if request.path.startswith('/pacientes') }}">Pacientes</a>
     <a href="/procedimentos/" class="{{ 'ativo' if request.path.startswith('/procedimentos') }}">Procedimentos</a>
     {% if g.user.papel != 'assistente' %}<a href="/modelos/" class="{{ 'ativo' if request.path.startswith('/modelos') }}">Fichas e termos</a>
+    <a href="/biblioteca/" class="{{ 'ativo' if request.path.startswith('/biblioteca') }}">Biblioteca</a>
     <a href="/exportacao/" class="{{ 'ativo' if request.path.startswith('/exportacao') }}">Backup</a>{% endif %}
     <a href="/configuracoes" class="{{ 'ativo' if request.path.startswith('/configuracoes') }}">Configurações</a>
     <form method="post" action="/sair" style="display:inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit">Sair</button></form>

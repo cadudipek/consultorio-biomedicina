@@ -2,6 +2,7 @@
 {% block titulo %}Fichas e termos{% endblock %}
 {% block conteudo %}
 <h1>Fichas e termos</h1>
+<p class="meta">Quer usar um modelo que você já tem em PDF ou Word? Guarde-o na <a href="/biblioteca/">Biblioteca</a>.</p>
 <div class="card">
   <div class="linha-topo"><h2 style="margin:0">Fichas de anamnese</h2><a class="btn" href="/modelos/fichas/novo">Nova ficha</a></div>
   {% for f in fichas %}
@@ -9,7 +10,7 @@
     <div><a href="/modelos/fichas/{{ f.id }}"><strong>{{ f.nome }}</strong></a>{% if f.demonstracao %}<span class="demo">DEMONSTRAÇÃO</span>{% endif %}
       {% if not f.ativo %} <span class="tag cinza">Inativa</span>{% endif %}
       <div class="meta">Versão {{ f.versao }} · usada em {{ f.n_proc }} procedimento(s)</div></div>
-    <div style="display:flex;gap:.4rem"><a class="btn sec peq" href="/modelos/fichas/{{ f.id }}">Editar</a>
+    <div style="display:flex;gap:.4rem"><a class="btn sec peq" href="/modelos/fichas/{{ f.id }}/imprimir">Imprimir em branco</a><a class="btn sec peq" href="/modelos/fichas/{{ f.id }}">Editar</a>
       <form method="post" action="/modelos/fichas/{{ f.id }}/alternar"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn sec peq">{{ 'Desativar' if f.ativo else 'Reativar' }}</button></form></div>
   </div>
   {% else %}<div class="vazio">Nenhuma ficha criada.</div>{% endfor %}
@@ -22,7 +23,7 @@
       <span class="tag info">{{ 'Consentimento do procedimento' if t.tipo=='consentimento' else 'Autorização de uso de imagem' }}</span>
       {% if t.demonstracao %}<span class="demo">DEMONSTRAÇÃO</span>{% endif %}{% if not t.ativo %} <span class="tag cinza">Inativo</span>{% endif %}
       <div class="meta">Versão {{ t.versao }} · usado em {{ t.n_proc }} procedimento(s)</div></div>
-    <div style="display:flex;gap:.4rem"><a class="btn sec peq" href="/modelos/termos/{{ t.id }}">Abrir</a>
+    <div style="display:flex;gap:.4rem"><a class="btn sec peq" href="/modelos/termos/{{ t.id }}/imprimir">Imprimir em branco</a><a class="btn sec peq" href="/modelos/termos/{{ t.id }}">Abrir</a>
       <form method="post" action="/modelos/termos/{{ t.id }}/alternar"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn sec peq">{{ 'Desativar' if t.ativo else 'Reativar' }}</button></form></div>
   </div>
   {% else %}<div class="vazio">Nenhum termo cadastrado.</div>{% endfor %}
