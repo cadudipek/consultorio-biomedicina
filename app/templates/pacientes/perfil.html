@@ -12,7 +12,7 @@
 <div class="card"><h2>Dados</h2>
   <p class="meta" style="margin:0">CPF: {{ (p.cpf or '')|cpf or 'não informado' }}<br>
   Nascimento: {{ p.data_nascimento|data or 'não informado' }}<br>
-  Telefone: {{ p.telefone or 'não informado' }}<br>
+  Telefone: {{ (p.telefone|tel) or 'não informado' }}<br>
   E-mail: {{ p.email or 'não informado' }}</p>
   {% if p.observacoes %}<p>{{ p.observacoes }}</p>{% endif %}
 </div>

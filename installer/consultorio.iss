@@ -28,7 +28,6 @@ Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortugue
 
 [Tasks]
 Name: "desktopicon"; Description: "Criar um atalho na Área de Trabalho"; 
-Name: "demoicon"; Description: "Criar também o atalho de DEMONSTRAÇÃO (dados fictícios)"; Flags: unchecked
 
 [Files]
 Source: "..\dist\Consultorio\*"; DestDir: "{app}"; Flags: recursesubdirs ignoreversion
@@ -36,7 +35,6 @@ Source: "..\dist\Consultorio\*"; DestDir: "{app}"; Flags: recursesubdirs ignorev
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\Consultorio.exe"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\Consultorio.exe"; Tasks: desktopicon
-Name: "{autodesktop}\{#AppName} (demonstração)"; Filename: "{app}\Consultorio.exe"; Parameters: "--demo"; Tasks: demoicon
 
 [Run]
 Filename: "{app}\Consultorio.exe"; Description: "Abrir o {#AppName} agora"; Flags: nowait postinstall skipifsilent

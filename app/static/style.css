@@ -46,7 +46,6 @@ th{font-size:.85rem;color:var(--suave);text-transform:none}
 .tabela-rolar{overflow-x:auto}
 .tag{display:inline-block;padding:.15rem .6rem;border-radius:999px;font-size:.82rem;font-weight:600;background:var(--verde-claro);color:var(--verde-esc)}
 .tag.pend{background:var(--ambar-bg);color:var(--ambar)} .tag.erro{background:var(--verm-bg);color:var(--verm)} .tag.info{background:var(--azul-bg);color:var(--azul)} .tag.cinza{background:#e9eeec;color:#44514d}
-.demo{background:#fff3d6;color:#7a4e00;border:1px dashed #c78a00;border-radius:6px;padding:0 .4rem;font-size:.78rem;font-weight:700;margin-left:.3rem}
 .vazio{color:var(--suave);padding:1rem 0;text-align:center}
 .letras{display:flex;flex-wrap:wrap;gap:.25rem;margin:.75rem 0}
 .letras a{min-width:36px;min-height:36px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--linha);border-radius:8px;text-decoration:none;background:#fff}
@@ -67,7 +66,7 @@ th{font-size:.85rem;color:var(--suave);text-transform:none}
 canvas.assin{width:100%;height:180px;border:2px dashed #9fb0aa;border-radius:10px;touch-action:none;background:#fff}
 .sr{position:absolute;left:-9999px}
 .rodape{max-width:1100px;margin:0 auto;padding:0 1rem 2rem;color:var(--suave);font-size:.85rem}
-@media print{.topo,.btn,.nav,.rodape,.nao-imprimir,.aviso-demo{display:none!important} body{background:#fff} .folha{border:0!important;box-shadow:none!important;padding:0!important;max-width:none!important}}
+@media print{.topo,.btn,.nav,.rodape,.nao-imprimir{display:none!important} body{background:#fff} .folha{border:0!important;box-shadow:none!important;padding:0!important;max-width:none!important}}
 .folha{background:#fff;border:1px solid var(--linha);border-radius:10px;padding:1.5rem 2rem;max-width:800px;margin:0 auto;color:#000}
 .folha h1{font-size:1.4rem;margin:0 0 .2rem} .folha .cab{display:grid;grid-template-columns:2fr 1fr;gap:.5rem 1.5rem;margin:1rem 0 1.2rem}
 .linha-em-branco{border-bottom:1px solid #000;min-height:1.6rem} .rot{font-size:.8rem;color:#333}

@@ -10,11 +10,11 @@
 </div>
 <div class="grade">
 <div class="card"><h2>Fichas (anamnese)</h2>
-  {% for f in fichas %}<label class="opcao"><input type="checkbox" name="fichas" value="{{ f.id }}" {{ 'checked' if f.id in sel_f }}><span>{{ f.nome }}{% if f.demonstracao %}<span class="demo">DEMONSTRAÇÃO</span>{% endif %}</span></label>
+  {% for f in fichas %}<label class="opcao"><input type="checkbox" name="fichas" value="{{ f.id }}" {{ 'checked' if f.id in sel_f }}><span>{{ f.nome }}</span></label>
   {% else %}<p class="meta">Nenhuma ficha criada ainda. Crie em “Fichas e termos”.</p>{% endfor %}
 </div>
 <div class="card"><h2>Termos</h2>
-  {% for t in termos %}<label class="opcao"><input type="checkbox" name="termos" value="{{ t.id }}" {{ 'checked' if t.id in sel_t }}><span>{{ t.titulo }} <span class="tag info">{{ 'Consentimento' if t.tipo=='consentimento' else 'Uso de imagem' }}</span>{% if t.demonstracao %}<span class="demo">DEMONSTRAÇÃO</span>{% endif %}</span></label>
+  {% for t in termos %}<label class="opcao"><input type="checkbox" name="termos" value="{{ t.id }}" {{ 'checked' if t.id in sel_t }}><span>{{ t.titulo }} <span class="tag info">{{ 'Consentimento' if t.tipo=='consentimento' else 'Uso de imagem' }}</span></span></label>
   {% else %}<p class="meta">Nenhum termo criado ainda. Crie em “Fichas e termos”.</p>{% endfor %}
 </div>
 </div>

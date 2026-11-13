@@ -82,7 +82,6 @@ def create_app(config=None):
     if os.environ.get("TRUST_PROXY") == "1":  # atrás de nginx/PaaS: usa o IP e o HTTPS reais
         from werkzeug.middleware.proxy_fix import ProxyFix
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
-    app.config.setdefault("DEMO", os.environ.get("DEMO") == "1")
     app.config.setdefault("PUBLIC_BASE_URL", os.environ.get("PUBLIC_BASE_URL", ""))
 
     app.teardown_appcontext(dbmod.close_db)
@@ -95,6 +94,16 @@ def create_app(config=None):
     app.jinja_env.filters["dt"] = _fmt_dt
     app.jinja_env.filters["data"] = _fmt_data
     app.jinja_env.filters["cpf"] = _fmt_cpf
+
+    def _fmt_tel(v):
+        n = "".join(ch for ch in (v or "") if ch.isdigit())
+        if len(n) == 11:
+            return f"({n[:2]}) {n[2:7]}-{n[7:]}"
+        if len(n) == 10:
+            return f"({n[:2]}) {n[2:6]}-{n[6:]}"
+        return v or ""
+
+    app.jinja_env.filters["tel"] = _fmt_tel
 
     @app.after_request
     def cabecalhos(resp):
@@ -157,12 +166,5 @@ def create_app(config=None):
 
         click.echo(f"Backup salvo em {fazer_backup(app)}")
 
-    @app.cli.command("seed")
-    def seed_cmd():
-        """Carrega dados FICTÍCIOS de demonstração."""
-        from .seed import carregar
-
-        carregar()
-        click.echo("Dados fictícios carregados.")
 
     return app

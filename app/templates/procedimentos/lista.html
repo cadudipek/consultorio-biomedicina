@@ -5,7 +5,7 @@
 <div class="card">
 {% for p in procs %}
 <div class="linha-lista">
-  <div><strong>{{ p.nome }}</strong>{% if p.demonstracao %}<span class="demo">DEMONSTRAÇÃO</span>{% endif %}
+  <div><strong>{{ p.nome }}</strong>
     {% if not p.ativo %} <span class="tag cinza">Inativo</span>{% endif %}
     <div class="meta">{{ p.n_fichas }} ficha(s) · {{ p.n_termos }} termo(s){% if p.descricao %} · {{ p.descricao }}{% endif %}</div></div>
   {% if g.user.papel != 'assistente' %}<div style="display:flex;gap:.4rem">

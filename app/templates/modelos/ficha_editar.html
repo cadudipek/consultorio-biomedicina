@@ -19,7 +19,7 @@
     <div><label>Tipo de resposta</label><select name="c{{ loop.index0 }}_tipo">{% for k, v in tipos.items() %}<option value="{{ k }}" {{ 'selected' if c.tipo==k }}>{{ v }}</option>{% endfor %}</select></div>
   </div>
   <label>Opções (uma por linha; só para escolha única ou múltipla)</label><textarea name="c{{ loop.index0 }}_opcoes" style="min-height:70px">{{ c.opcoes }}</textarea>
-  <label>Se a resposta for “Sim”, pedir mais detalhes (só para Sim ou não)</label><input type="text" name="c{{ loop.index0 }}_detalhe" value="{{ c.detalhe }}" placeholder="Ex.: Quais? (deixe vazio para não perguntar)">
+  <div class="det-wrap"><label>Se a resposta for “Sim”, pedir mais detalhes</label><input type="text" name="c{{ loop.index0 }}_detalhe" value="{{ c.detalhe }}" placeholder="Ex.: Quais? (deixe vazio para não perguntar)"></div>
   <label>Texto de ajuda (opcional)</label><input type="text" name="c{{ loop.index0 }}_ajuda" value="{{ c.ajuda }}">
   <label class="opcao"><input type="checkbox" name="c{{ loop.index0 }}_obrig" value="1" {{ 'checked' if c.obrigatorio }}><span>Resposta obrigatória</span></label>
 </div>
@@ -38,7 +38,7 @@
     <div><label>Tipo de resposta</label><select name="c__I___tipo">{% for k, v in tipos.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select></div>
   </div>
   <label>Opções (uma por linha; só para escolha única ou múltipla)</label><textarea name="c__I___opcoes" style="min-height:70px"></textarea>
-  <label>Se a resposta for “Sim”, pedir mais detalhes (só para Sim ou não)</label><input type="text" name="c__I___detalhe" placeholder="Ex.: Quais? (deixe vazio para não perguntar)">
+  <div class="det-wrap" hidden><label>Se a resposta for “Sim”, pedir mais detalhes</label><input type="text" name="c__I___detalhe" placeholder="Ex.: Quais? (deixe vazio para não perguntar)"></div>
   <label>Texto de ajuda (opcional)</label><input type="text" name="c__I___ajuda">
   <label class="opcao"><input type="checkbox" name="c__I___obrig" value="1"><span>Resposta obrigatória</span></label>
 </div>
@@ -54,6 +54,13 @@ document.getElementById('add').addEventListener('click', function () {
   document.querySelector('#campos .campo:last-child input[type=text]').focus();
 });
 var lista = document.getElementById('campos');
+function ajustaDetalhe(card) {
+  var t = card.querySelector('select'), w = card.querySelector('.det-wrap');
+  if (t && w) w.hidden = t.value !== 'sim_nao';
+}
+Array.prototype.forEach.call(lista.querySelectorAll('.campo'), ajustaDetalhe);
+lista.addEventListener('change', function (e) { if (e.target.tagName === 'SELECT') ajustaDetalhe(e.target.closest('.campo')); });
+document.getElementById('add').addEventListener('click', function () { ajustaDetalhe(lista.lastElementChild); });
 lista.addEventListener('click', function (e) {
   var b = e.target.closest('[data-acao]'); if (!b) return;
   var card = b.closest('.campo'), a = b.dataset.acao;

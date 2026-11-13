@@ -8,9 +8,9 @@ import urllib.request
 from pathlib import Path
 
 
-def pasta_dados(demo):
+def pasta_dados():
     base = os.environ.get("LOCALAPPDATA") or str(Path.home() / ".local" / "share")
-    return str(Path(base) / ("Consultorio-Demonstracao" if demo else "Consultorio"))
+    return str(Path(base) / "Consultorio")
 
 
 def porta_livre():
@@ -46,17 +46,13 @@ def verificar_atualizacao(app):
 
 
 def main():
-    demo = "--demo" in sys.argv
-    os.environ["CONSULTORIO_DATA"] = pasta_dados(demo)
+    os.environ["CONSULTORIO_DATA"] = pasta_dados()
     from app import create_app
     from app import db as dbmod
 
-    app = create_app({"PRIMEIRO_ACESSO": not demo, "LINK_REMOTO": False, "DEMO": demo})
+    app = create_app({"PRIMEIRO_ACESSO": True, "LINK_REMOTO": False})
     with app.app_context():
         dbmod.init_db()
-        if demo and dbmod.q1("SELECT 1 FROM usuarios LIMIT 1") is None:
-            from app.seed import carregar
-            carregar()
 
     threading.Thread(target=verificar_atualizacao, args=(app,), daemon=True).start()
 
@@ -72,7 +68,7 @@ def main():
         except Exception:
             time.sleep(0.1)
 
-    titulo = "Consultório (demonstração)" if demo else "Consultório"
+    titulo = "Consultório"
     try:
         import webview
         webview.settings["ALLOW_DOWNLOADS"] = True  # PDFs, exportação e backup
