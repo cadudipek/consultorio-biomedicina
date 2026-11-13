@@ -78,12 +78,18 @@ jobs:
           $pg = Invoke-WebRequest "$B/" -WebSession $s -UseBasicParsing
           Invoke-WebRequest "$B/modelos-iniciais" -Method Post -WebSession $s -UseBasicParsing -Body @{ csrf_token = (Tok $pg) } | Out-Null
           $pg = Invoke-WebRequest "$B/pacientes/novo" -WebSession $s -UseBasicParsing
-          Invoke-WebRequest "$B/pacientes/novo" -Method Post -WebSession $s -UseBasicParsing `
-            -Body @{ csrf_token = (Tok $pg); nome = "Paciente Teste"; cpf = "11144477735"; telefone = "31999990000" } | Out-Null
+          $r = Invoke-WebRequest "$B/pacientes/novo" -Method Post -WebSession $s -UseBasicParsing `
+            -Body @{ csrf_token = (Tok $pg); nome = "Paciente Teste"; cpf = "11144477735"; telefone = "31999990000" }
+          Write-Host "paciente -> $($r.BaseResponse.RequestMessage.RequestUri.AbsolutePath)"
+          if ($r.Content -notmatch "Paciente Teste") { throw "Paciente não foi cadastrada" }
           $pg = Invoke-WebRequest "$B/atendimentos/novo?paciente=1&procedimento=1" -WebSession $s -UseBasicParsing
-          Invoke-WebRequest "$B/atendimentos/novo" -Method Post -WebSession $s -UseBasicParsing `
-            -Body @{ csrf_token = (Tok $pg); paciente = "1"; procedimento = "1"; data_atendimento = "2026-11-10" } | Out-Null
-          $pdf = Invoke-WebRequest "$B/atendimentos/1/pdf" -WebSession $s -UseBasicParsing
+          $r = Invoke-WebRequest "$B/atendimentos/novo" -Method Post -WebSession $s -UseBasicParsing `
+            -Body @{ csrf_token = (Tok $pg); paciente = "1"; procedimento = "1"; data_atendimento = "2026-11-10" }
+          $dest = $r.BaseResponse.RequestMessage.RequestUri.AbsolutePath
+          Write-Host "atendimento -> $dest"
+          if ($dest -notmatch "^/atendimentos/(\d+)$") { throw "Atendimento não foi aberto (parou em $dest)" }
+          $aid = $Matches[1]
+          $pdf = Invoke-WebRequest "$B/atendimentos/$aid/pdf" -WebSession $s -UseBasicParsing
           if ($pdf.Headers["Content-Type"] -notlike "application/pdf*") { throw "PDF não foi gerado" }
           $pg = Invoke-WebRequest "$B/exportacao/" -WebSession $s -UseBasicParsing
           $bk = Invoke-WebRequest "$B/exportacao/backup" -Method Post -WebSession $s -UseBasicParsing `
