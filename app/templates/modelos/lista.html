@@ -7,7 +7,7 @@
   <div class="linha-topo"><h2 style="margin:0">Fichas de anamnese</h2><a class="btn" href="/modelos/fichas/novo">Nova ficha</a></div>
   {% for f in fichas %}
   <div class="linha-lista">
-    <div><a href="/modelos/fichas/{{ f.id }}"><strong>{{ f.nome }}</strong></a>{% if f.demonstracao %}<span class="demo">DEMONSTRAÇÃO</span>{% endif %}
+    <div><a href="/modelos/fichas/{{ f.id }}"><strong>{{ f.nome }}</strong></a>
       {% if not f.ativo %} <span class="tag cinza">Inativa</span>{% endif %}
       <div class="meta">Versão {{ f.versao }} · usada em {{ f.n_proc }} procedimento(s)</div></div>
     <div style="display:flex;gap:.4rem"><a class="btn sec peq" href="/modelos/fichas/{{ f.id }}/imprimir">Imprimir em branco</a><a class="btn sec peq" href="/modelos/fichas/{{ f.id }}">Editar</a>
@@ -21,7 +21,7 @@
   <div class="linha-lista">
     <div><a href="/modelos/termos/{{ t.id }}"><strong>{{ t.titulo }}</strong></a>
       <span class="tag info">{{ 'Consentimento do procedimento' if t.tipo=='consentimento' else 'Autorização de uso de imagem' }}</span>
-      {% if t.demonstracao %}<span class="demo">DEMONSTRAÇÃO</span>{% endif %}{% if not t.ativo %} <span class="tag cinza">Inativo</span>{% endif %}
+      {% if not t.ativo %} <span class="tag cinza">Inativo</span>{% endif %}
       <div class="meta">Versão {{ t.versao }} · usado em {{ t.n_proc }} procedimento(s)</div></div>
     <div style="display:flex;gap:.4rem"><a class="btn sec peq" href="/modelos/termos/{{ t.id }}/imprimir">Imprimir em branco</a><a class="btn sec peq" href="/modelos/termos/{{ t.id }}">Abrir</a>
       <form method="post" action="/modelos/termos/{{ t.id }}/alternar"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn sec peq">{{ 'Desativar' if t.ativo else 'Reativar' }}</button></form></div>

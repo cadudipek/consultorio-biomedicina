@@ -23,7 +23,7 @@
     <label for="ue">E-mail</label><input id="ue" name="email" type="email" required>
     <label for="up">Papel</label>
     <select id="up" name="papel">
-      <option value="assistente">Assistente (cadastra pacientes e entrega documentos; não vê fotos nem prontuário)</option>
+      <option value="assistente">Assistente (cadastra e entrega documentos; não vê fotos)</option>
       <option value="profissional">Profissional (acesso clínico completo)</option>
       <option value="admin">Administrador</option>
     </select>
@@ -37,7 +37,7 @@
 <div class="card"><h2>Usuários</h2>
 <div class="tabela-rolar"><table>
 <thead><tr><th>Nome</th><th>E-mail</th><th>Papel</th><th>Situação</th><th></th></tr></thead>
-{% for u in usuarios %}<tr><td>{{ u.nome }}</td><td>{{ u.email }}</td><td>{{ u.papel }}</td>
+{% for u in usuarios %}<tr><td>{{ u.nome }}</td><td>{{ u.email }}</td><td>{{ {'admin':'Administradora','profissional':'Profissional','assistente':'Assistente'}.get(u.papel, u.papel) }}</td>
 <td>{% if u.ativo %}<span class="tag">Ativo</span>{% else %}<span class="tag cinza">Inativo</span>{% endif %}</td>
 <td>{% if u.id != g.user.id %}<form method="post" action="/configuracoes/usuarios/{{ u.id }}/alternar"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn sec peq" type="submit">{{ 'Desativar' if u.ativo else 'Reativar' }}</button></form>{% endif %}</td></tr>{% endfor %}
 </table></div></div>

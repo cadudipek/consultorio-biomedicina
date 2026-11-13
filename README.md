@@ -20,16 +20,18 @@ e um procedimento) para a profissional revisar. Os dados ficam em `%LOCALAPPDATA
 apagados ao desinstalar. Atualizações: o app avisa quando há versão nova; basta instalar por cima.
 O instalador e a página são gerados automaticamente (`.github/workflows/`).
 
-## Rodar no seu computador (demonstração)
+Manual de uso ilustrado: [docs/Manual-Consultorio.pdf](docs/Manual-Consultorio.pdf).
+
+## Rodar a partir do código (desenvolvimento)
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-flask --app app seed            # cria banco, usuários e dados FICTÍCIOS
 flask --app app run
 ```
-Abra http://127.0.0.1:5000. Acesso de demonstração (só para o banco de demonstração):
-`demo@exemplo.test` / `demonstracao-123` (administradora) e `assistente@exemplo.test` / mesma senha.
+Abra http://127.0.0.1:5000 e crie o primeiro acesso na tela inicial.
+
+`tools/demo_seed.py` é uma ferramenta do autor para gerar dados fictícios (capturas do manual e vídeo). Ela **não** faz parte do instalador.
 
 ## Uso real no consultório (sem dados de exemplo)
 
@@ -37,7 +39,6 @@ Abra http://127.0.0.1:5000. Acesso de demonstração (só para o banco de demons
 flask --app app init-db
 flask --app app criar-usuario --papel admin     # pergunta nome, e-mail e senha (mín. 10 caracteres)
 ```
-Não rode `seed` no banco real (ele se recusa se já houver usuários).
 
 ## Implantação (HTTPS obrigatório com dados reais)
 
@@ -80,7 +81,7 @@ Cobrem login e bloqueio, permissões, CSRF, CPF duplicado, versionamento de fich
 link expirado/revogado, isolamento entre atendimentos, travas do banco, detecção de adulteração, upload seguro, PDF, ZIP, backup e seed.
 
 ## Roteiro de testes manual (com a profissional)
-1. Entrar com `demo@exemplo.test`. Ver o painel de pendências.
+1. Criar o primeiro acesso e entrar. Ver o painel de pendências.
 2. **Pacientes**: cadastrar “Teste Fictício”; buscar por “teste” (sem acento) e filtrar por procedimento.
 3. **Fichas e termos**: criar ficha com 1 pergunta de cada tipo; cadastrar um termo de consentimento e um de imagem.
 4. **Procedimentos**: associar ficha e termos a um procedimento.

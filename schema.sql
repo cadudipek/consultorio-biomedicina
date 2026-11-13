@@ -39,8 +39,7 @@ CREATE TABLE IF NOT EXISTS procedimentos (
     id         INTEGER PRIMARY KEY,
     nome       TEXT NOT NULL UNIQUE,
     descricao  TEXT,
-    ativo      INTEGER NOT NULL DEFAULT 1 CHECK (ativo IN (0,1)),
-    demonstracao INTEGER NOT NULL DEFAULT 0
+    ativo      INTEGER NOT NULL DEFAULT 1 CHECK (ativo IN (0,1))
 );
 
 -- ---------- Modelos de ficha (anamnese) com versões ----------
@@ -48,8 +47,7 @@ CREATE TABLE IF NOT EXISTS fichas_modelo (
     id         INTEGER PRIMARY KEY,
     nome       TEXT NOT NULL UNIQUE,
     descricao  TEXT,
-    ativo      INTEGER NOT NULL DEFAULT 1 CHECK (ativo IN (0,1)),
-    demonstracao INTEGER NOT NULL DEFAULT 0
+    ativo      INTEGER NOT NULL DEFAULT 1 CHECK (ativo IN (0,1))
 );
 CREATE TABLE IF NOT EXISTS fichas_versao (
     id         INTEGER PRIMARY KEY,
@@ -78,8 +76,7 @@ CREATE TABLE IF NOT EXISTS termos_modelo (
     id         INTEGER PRIMARY KEY,
     titulo     TEXT NOT NULL UNIQUE,
     tipo       TEXT NOT NULL CHECK (tipo IN ('consentimento','imagem')),
-    ativo      INTEGER NOT NULL DEFAULT 1 CHECK (ativo IN (0,1)),
-    demonstracao INTEGER NOT NULL DEFAULT 0
+    ativo      INTEGER NOT NULL DEFAULT 1 CHECK (ativo IN (0,1))
 );
 CREATE TABLE IF NOT EXISTS termos_versao (
     id            INTEGER PRIMARY KEY,

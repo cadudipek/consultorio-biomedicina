@@ -1,4 +1,4 @@
-"""Modelos iniciais (não são de demonstração): ponto de partida para a profissional revisar e adaptar."""
+"""Modelos iniciais: ponto de partida para a profissional revisar e adaptar."""
 import json
 
 from . import db as d
@@ -40,17 +40,17 @@ def ja_existe():
 
 
 def criar():
-    mid = d.run("INSERT INTO fichas_modelo (nome,descricao,demonstracao) VALUES (?,?,0)",
+    mid = d.run("INSERT INTO fichas_modelo (nome,descricao) VALUES (?,?)",
                 ("Anamnese geral (modelo inicial)", "Perguntas básicas de saúde. Edite à vontade."))
     vid = d.run("INSERT INTO fichas_versao (modelo_id,numero) VALUES (?,1)", (mid,))
     for i, (rot, tipo, ob, ops, *det) in enumerate(CAMPOS, 1):
         d.run("INSERT INTO ficha_campos (versao_id,ordem,rotulo,tipo,obrigatorio,opcoes,detalhe) VALUES (?,?,?,?,?,?,?)",
               (vid, i, rot, tipo, ob, json.dumps(ops, ensure_ascii=False) if ops else None, det[0] if det else None))
-    t1 = d.run("INSERT INTO termos_modelo (titulo,tipo,demonstracao) VALUES (?,?,0)", ("Termo de consentimento (modelo inicial)", "consentimento"))
+    t1 = d.run("INSERT INTO termos_modelo (titulo,tipo) VALUES (?,?)", ("Termo de consentimento (modelo inicial)", "consentimento"))
     d.run("INSERT INTO termos_versao (termo_id,numero,conteudo,hash_conteudo) VALUES (?,1,?,?)", (t1, CONSENT, sha256(CONSENT)))
-    t2 = d.run("INSERT INTO termos_modelo (titulo,tipo,demonstracao) VALUES (?,?,0)", ("Autorização de uso de imagem (modelo inicial)", "imagem"))
+    t2 = d.run("INSERT INTO termos_modelo (titulo,tipo) VALUES (?,?)", ("Autorização de uso de imagem (modelo inicial)", "imagem"))
     d.run("INSERT INTO termos_versao (termo_id,numero,conteudo,hash_conteudo) VALUES (?,1,?,?)", (t2, IMAGEM, sha256(IMAGEM)))
-    pid = d.run("INSERT INTO procedimentos (nome,descricao,demonstracao) VALUES (?,?,0)",
+    pid = d.run("INSERT INTO procedimentos (nome,descricao) VALUES (?,?)",
                 ("Atendimento padrão (modelo inicial)", "Renomeie para o seu procedimento ou crie outros."))
     d.run("INSERT INTO procedimento_fichas VALUES (?,?)", (pid, mid))
     d.run("INSERT INTO procedimento_termos VALUES (?,?)", (pid, t1))

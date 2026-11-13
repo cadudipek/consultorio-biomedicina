@@ -19,7 +19,7 @@
   {% for p in pacientes %}
   <div class="linha-lista">
     <div><a href="/pacientes/{{ p.id }}"><strong>{{ p.nome }}</strong></a>
-      <div class="meta">{% if p.telefone %}{{ p.telefone }}{% else %}sem telefone{% endif %}</div></div>
+      <div class="meta">{% if p.telefone %}{{ p.telefone|tel }}{% else %}sem telefone{% endif %}</div></div>
     <a class="btn sec peq" href="/pacientes/{{ p.id }}">Abrir ficha</a>
   </div>
   {% else %}<div class="vazio">Nenhum paciente encontrado.</div>{% endfor %}

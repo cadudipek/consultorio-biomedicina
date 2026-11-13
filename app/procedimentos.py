@@ -7,8 +7,8 @@ bp = Blueprint("procedimentos", __name__, url_prefix="/procedimentos")
 
 
 def _opcoes():
-    fichas = q("SELECT id,nome,demonstracao FROM fichas_modelo WHERE ativo=1 ORDER BY nome")
-    termos = q("SELECT id,titulo,tipo,demonstracao FROM termos_modelo WHERE ativo=1 ORDER BY tipo,titulo")
+    fichas = q("SELECT id,nome FROM fichas_modelo WHERE ativo=1 ORDER BY nome")
+    termos = q("SELECT id,titulo,tipo FROM termos_modelo WHERE ativo=1 ORDER BY tipo,titulo")
     return fichas, termos
 
 
