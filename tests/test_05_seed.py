@@ -23,7 +23,7 @@ def test_seed_carrega_tudo(app_vazio):
         for r in db.q("SELECT id FROM atendimento_documentos WHERE hash_documento IS NOT NULL"):
             assert verificar_integridade(r["id"]) is True
     c = Cli(app.test_client())
-    assert c.login("helena@exemplo.com", "demonstracao-123").status_code == 302
+    assert c.login("kelly.bittencourt@exemplo.com", "demonstracao-123").status_code == 302
     for url in ["/", "/pacientes/", "/pacientes/1", "/atendimentos/1", "/atendimentos/2", "/pacientes/1/fotos",
                 "/pacientes/1/comparar?antes=1&depois=2", "/modelos/", "/procedimentos/", "/exportacao/", "/configuracoes", "/pacientes/4/fotos"]:
         assert c.get(url).status_code == 200, url

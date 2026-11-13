@@ -54,7 +54,7 @@ def carregar():
     if d.q1("SELECT 1 FROM usuarios LIMIT 1"):
         raise SystemExit("O banco já tem usuários. Use um banco vazio.")
     uid = d.run("INSERT INTO usuarios (nome,email,senha_hash,papel) VALUES (?,?,?,?)",
-                ("Dra. Helena Souza", "helena@exemplo.com", generate_password_hash(SENHA_DEMO), "admin"))
+                ("Dra. Kelly Bittencourt", "kelly.bittencourt@exemplo.com", generate_password_hash(SENHA_DEMO), "admin"))
     d.run("INSERT INTO usuarios (nome,email,senha_hash,papel) VALUES (?,?,?,?)",
           ("Marina Assistente", "marina@exemplo.com", generate_password_hash(SENHA_DEMO), "assistente"))
 
