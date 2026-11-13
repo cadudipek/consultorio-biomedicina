@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titulo %}Primeiro acesso{% endblock %}
+{% block conteudo %}
+<div class="card login">
+  <h1>Bem-vinda!</h1>
+  <p class="meta">Vamos criar o seu acesso. Os dados ficam guardados somente neste computador.</p>
+  <form method="post" autocomplete="off">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="nome">Seu nome</label>
+    <input id="nome" name="nome" type="text" required autofocus>
+    <label for="email">E-mail (será o seu login)</label>
+    <input id="email" name="email" type="email" required>
+    <label for="senha">Senha</label>
+    <input id="senha" name="senha" type="password" required minlength="10" autocomplete="new-password">
+    <div class="ajuda">Mínimo de 10 caracteres. Anote em local seguro.</div>
+    <label for="conf">Repita a senha</label>
+    <input id="conf" name="conf" type="password" required minlength="10" autocomplete="new-password">
+    <div class="form-acoes"><button class="btn" type="submit">Criar acesso e entrar</button></div>
+  </form>
+</div>
+{% endblock %}

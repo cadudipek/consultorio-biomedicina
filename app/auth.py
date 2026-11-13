@@ -50,6 +50,32 @@ def login():
     return render_template("auth/login.html")
 
 
+@bp.route("/primeiro-acesso", methods=["GET", "POST"])
+def primeiro_acesso():
+    """Cadastro do primeiro usuário (admin). Só funciona enquanto não existe nenhum usuário."""
+    if q1("SELECT 1 FROM usuarios LIMIT 1"):
+        return redirect(url_for("auth.login"))
+    if request.method == "POST":
+        nome = request.form.get("nome", "").strip()
+        email = request.form.get("email", "").lower().strip()
+        senha, conf = request.form.get("senha", ""), request.form.get("conf", "")
+        if not nome or "@" not in email:
+            flash("Informe o nome e um e-mail válido.", "erro")
+        elif len(senha) < 10:
+            flash("A senha precisa ter pelo menos 10 caracteres.", "erro")
+        elif senha != conf:
+            flash("A confirmação não confere com a senha.", "erro")
+        else:
+            uid = run("INSERT INTO usuarios (nome,email,senha_hash,papel) VALUES (?,?,?,'admin')",
+                      (nome, email, generate_password_hash(senha)))
+            auditar("criar_primeiro_usuario", "usuarios", uid, usuario_id=uid)
+            commit()
+            session.clear()
+            session["user_id"] = uid
+            return redirect(url_for("painel.inicio"))
+    return render_template("auth/primeiro_acesso.html")
+
+
 @bp.route("/sair", methods=["POST"])
 def logout():
     if g.user:

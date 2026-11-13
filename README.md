@@ -7,6 +7,13 @@ assinatura eletrônica com verificação de integridade, fotos antes/depois, pen
 Projeto da Atividade Extensionista II (Tecnologia em Banco de Dados). **Todos os dados de exemplo são fictícios.**
 Arquitetura, justificativa técnica e custos: `docs/ARQUITETURA.md`. Modelo do banco: `schema.sql`.
 
+## Instalação no Windows (recomendada)
+
+Baixe o instalador `Consultorio-Setup-*.exe` na página **Releases** deste repositório, execute e siga o assistente.
+O aplicativo abre em janela própria; no primeiro uso pede nome, e-mail e senha. Os dados ficam em
+`%LOCALAPPDATA%\Consultorio` e **não** são apagados ao desinstalar. Para testar com dados fictícios, use o
+atalho "Consultório (demonstração)". O instalador é gerado automaticamente por `.github/workflows/instalador.yml`.
+
 ## Rodar no seu computador (demonstração)
 
 ```bash

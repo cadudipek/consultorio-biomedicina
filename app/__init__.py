@@ -1,6 +1,6 @@
 import os
 import secrets
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -10,7 +10,10 @@ from flask import Flask, render_template
 from . import db as dbmod
 from .seguranca import carregar_usuario, csrf_token, verificar_csrf
 
-FUSO = ZoneInfo("America/Sao_Paulo")
+try:
+    FUSO = ZoneInfo("America/Sao_Paulo")
+except Exception:  # Windows sem o pacote tzdata: o Brasil não tem horário de verão desde 2019
+    FUSO = timezone(timedelta(hours=-3), "BRT")
 
 
 def _fmt_dt(valor, formato="%d/%m/%Y %H:%M"):
@@ -38,8 +41,22 @@ def _fmt_cpf(v):
     return f"{v[:3]}.{v[3:6]}.{v[6:9]}-{v[9:]}" if len(v) == 11 else v
 
 
+def _exigir_primeiro_acesso():
+    """No app instalado, enquanto não houver usuário, leva para o cadastro inicial."""
+    from flask import current_app, redirect, request, url_for
+
+    if not current_app.config.get("PRIMEIRO_ACESSO"):
+        return None
+    if request.endpoint in ("auth.primeiro_acesso", "static"):
+        return None
+    if dbmod.q1("SELECT 1 FROM usuarios LIMIT 1") is None:
+        return redirect(url_for("auth.primeiro_acesso"))
+    return None
+
+
 def create_app(config=None):
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__, instance_path=os.environ.get("CONSULTORIO_DATA") or None,
+                instance_relative_config=True)
     Path(app.instance_path).mkdir(parents=True, exist_ok=True)
 
     chave_arq = Path(app.instance_path) / "secret_key"
@@ -68,6 +85,7 @@ def create_app(config=None):
     app.config.setdefault("PUBLIC_BASE_URL", os.environ.get("PUBLIC_BASE_URL", ""))
 
     app.teardown_appcontext(dbmod.close_db)
+    app.before_request(_exigir_primeiro_acesso)
     app.before_request(carregar_usuario)
     app.before_request(verificar_csrf)
     app.jinja_env.globals["csrf_token"] = csrf_token
