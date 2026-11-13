@@ -101,19 +101,11 @@ def create_app(config=None):
         resp.headers.setdefault("Cache-Control", "no-store")
         return resp
 
-    from . import auth, pacientes, procedimentos
+    # Importações explícitas (o empacotador do instalador precisa enxergá-las)
+    from . import (arquivos, atendimentos, auth, exportacao, modelos, painel, pacientes,
+                   procedimentos, publico)
 
-    for bp in (auth.bp, pacientes.bp, procedimentos.bp):
-        app.register_blueprint(bp)
-
-    # Módulos opcionais registrados conforme forem implementados
-    for nome in ("modelos", "atendimentos", "publico", "arquivos", "painel", "exportacao"):
-        try:
-            mod = __import__(f"app.{nome}", fromlist=["bp"])
-        except ModuleNotFoundError as e:
-            if e.name != f"app.{nome}":
-                raise
-            continue
+    for mod in (auth, pacientes, procedimentos, modelos, atendimentos, publico, arquivos, painel, exportacao):
         app.register_blueprint(mod.bp)
 
     @app.errorhandler(403)

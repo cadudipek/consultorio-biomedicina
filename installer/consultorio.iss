@@ -27,7 +27,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "Criar um atalho na Área de Trabalho"; Flags: checkedonce
+Name: "desktopicon"; Description: "Criar um atalho na Área de Trabalho"; 
 Name: "demoicon"; Description: "Criar também o atalho de DEMONSTRAÇÃO (dados fictícios)"; Flags: unchecked
 
 [Files]

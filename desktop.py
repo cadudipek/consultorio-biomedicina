@@ -32,7 +32,7 @@ def main():
             from app.seed import carregar
             carregar()
 
-    porta = porta_livre()
+    porta = int(os.environ.get("CONSULTORIO_PORTA") or porta_livre())
     url = f"http://127.0.0.1:{porta}/"
 
     from waitress import serve
