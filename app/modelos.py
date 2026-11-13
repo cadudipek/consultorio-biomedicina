@@ -67,7 +67,8 @@ def _ler_campos_form(form):
                 erros.append(f"“{rotulo}”: informe pelo menos 2 opções (uma por linha).")
             opcoes = json.dumps(lista, ensure_ascii=False)
         campos.append({"rotulo": rotulo, "tipo": tipo, "obrigatorio": 1 if form.get(f"c{i}_obrig") else 0,
-                       "opcoes": opcoes, "ajuda": form.get(f"c{i}_ajuda", "").strip() or None})
+                       "opcoes": opcoes, "ajuda": form.get(f"c{i}_ajuda", "").strip() or None,
+                       "detalhe": (form.get(f"c{i}_detalhe", "").strip()[:80] or None) if tipo == "sim_nao" else None})
     if not campos:
         erros.append("A ficha precisa ter pelo menos uma pergunta.")
     return campos, erros
@@ -98,21 +99,22 @@ def ficha_editar(mid):
                 vid, numero = versao["id"], versao["numero"]
                 run("DELETE FROM ficha_campos WHERE versao_id=?", (vid,))
             for ordem, c in enumerate(campos, 1):
-                run("INSERT INTO ficha_campos (versao_id,ordem,rotulo,tipo,obrigatorio,opcoes,ajuda) VALUES (?,?,?,?,?,?,?)",
-                    (vid, ordem, c["rotulo"], c["tipo"], c["obrigatorio"], c["opcoes"], c["ajuda"]))
+                run("INSERT INTO ficha_campos (versao_id,ordem,rotulo,tipo,obrigatorio,opcoes,ajuda,detalhe) VALUES (?,?,?,?,?,?,?,?)",
+                    (vid, ordem, c["rotulo"], c["tipo"], c["obrigatorio"], c["opcoes"], c["ajuda"], c["detalhe"]))
             auditar("editar", "fichas_modelo", mid, {"versao": numero, "campos": [c["rotulo"] for c in campos], "nova_versao": bool(em_uso)})
             commit()
             flash(f"Ficha salva (versão {numero})." + (" Atendimentos anteriores continuam com a versão que usaram." if em_uso else ""), "ok")
             return redirect(url_for("modelos.ficha_editar", mid=mid))
         versao_campos = [
             {"rotulo": request.form.get(f"c{i}_rotulo", ""), "tipo": request.form.get(f"c{i}_tipo", "texto"),
-             "obrigatorio": 1 if request.form.get(f"c{i}_obrig") else 0, "opcoes": request.form.get(f"c{i}_opcoes", ""), "ajuda": request.form.get(f"c{i}_ajuda", "")}
+             "obrigatorio": 1 if request.form.get(f"c{i}_obrig") else 0, "opcoes": request.form.get(f"c{i}_opcoes", ""), "ajuda": request.form.get(f"c{i}_ajuda", ""),
+             "detalhe": request.form.get(f"c{i}_detalhe", "")}
             for i in range(int(request.form.get("n_campos", "0") or 0))]
     else:
         versao_campos = []
         for c in campos_da_versao(versao["id"]):
             versao_campos.append({"rotulo": c["rotulo"], "tipo": c["tipo"], "obrigatorio": c["obrigatorio"],
-                                  "opcoes": "\n".join(opcoes_do_campo(c)), "ajuda": c["ajuda"] or ""})
+                                  "opcoes": "\n".join(opcoes_do_campo(c)), "ajuda": c["ajuda"] or "", "detalhe": c["detalhe"] or ""})
     return render_template("modelos/ficha_editar.html", modelo=modelo, versao=versao, campos=versao_campos, tipos=TIPOS, em_uso=em_uso)
 
 

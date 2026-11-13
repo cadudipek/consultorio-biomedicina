@@ -68,7 +68,8 @@ CREATE TABLE IF NOT EXISTS ficha_campos (
                 ('texto','texto_longo','numero','data','sim_nao','escolha_unica','multipla_escolha')),
     obrigatorio INTEGER NOT NULL DEFAULT 0 CHECK (obrigatorio IN (0,1)),
     opcoes      TEXT,             -- JSON: lista de opções (escolha_unica / multipla_escolha)
-    ajuda       TEXT
+    ajuda       TEXT,
+    detalhe     TEXT              -- sim_nao: pergunta extra exibida quando a resposta é Sim (ex.: "Quais?")
 );
 CREATE INDEX IF NOT EXISTS ix_campos_versao ON ficha_campos (versao_id, ordem);
 
@@ -138,6 +139,7 @@ CREATE TABLE IF NOT EXISTS respostas (
     documento_id INTEGER NOT NULL REFERENCES atendimento_documentos(id) ON DELETE CASCADE,
     campo_id     INTEGER NOT NULL REFERENCES ficha_campos(id),
     valor        TEXT,
+    detalhe      TEXT,
     UNIQUE (documento_id, campo_id)
 );
 

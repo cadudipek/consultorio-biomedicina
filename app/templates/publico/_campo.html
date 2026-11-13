@@ -6,8 +6,10 @@
 {% if c.tipo == 'sim_nao' %}
   <fieldset style="border:0;padding:0;margin:.9rem 0 0"><legend style="font-weight:600">{{ c.rotulo }}{% if c.obrigatorio %} *{% endif %}</legend>
     {% if c.ajuda %}<div class="ajuda">{{ c.ajuda }}</div>{% endif %}
-    <div style="display:flex;gap:1.5rem"><label class="opcao"><input type="radio" name="{{ nome }}" value="Sim" {{ 'checked' if v=='Sim' }}>Sim</label>
-    <label class="opcao"><input type="radio" name="{{ nome }}" value="Não" {{ 'checked' if v=='Não' }}>Não</label></div></fieldset>
+    <div style="display:flex;gap:1.5rem"><label class="opcao"><input type="radio" name="{{ nome }}" value="Sim" {{ 'checked' if v=='Sim' }} onchange="var d=document.getElementById('det_{{ c.id }}');d.hidden=false;d.querySelector('input').focus()">Sim</label>
+    <label class="opcao"><input type="radio" name="{{ nome }}" value="Não" {{ 'checked' if v=='Não' }} onchange="document.getElementById('det_{{ c.id }}').hidden=true">Não</label></div>
+    {% if c.detalhe %}<div id="det_{{ c.id }}" {{ 'hidden' if v!='Sim' }} style="margin-top:.4rem"><label for="detalhe_{{ c.id }}">{{ c.detalhe }} *</label>
+      <input id="detalhe_{{ c.id }}" name="detalhe_{{ c.id }}" type="text" maxlength="500" value="{{ respostas.get('detalhe_' ~ c.id) or '' }}"></div>{% endif %}</fieldset>
 {% elif c.tipo == 'escolha_unica' %}
   <fieldset style="border:0;padding:0;margin:.9rem 0 0"><legend style="font-weight:600">{{ c.rotulo }}{% if c.obrigatorio %} *{% endif %}</legend>
     {% if c.ajuda %}<div class="ajuda">{{ c.ajuda }}</div>{% endif %}

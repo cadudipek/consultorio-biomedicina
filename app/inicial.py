@@ -26,10 +26,8 @@ Fotos de antes e depois são feitas para acompanhar a evolução do tratamento e
 
 CAMPOS = [
     ("Qual o motivo da sua consulta?", "texto_longo", 1, None),
-    ("Possui alguma alergia (medicamentos, cosméticos, alimentos)?", "sim_nao", 1, None),
-    ("Se sim, a quê?", "texto", 0, None),
-    ("Usa algum medicamento atualmente?", "sim_nao", 1, None),
-    ("Quais medicamentos?", "texto", 0, None),
+    ("Possui alguma alergia (medicamentos, cosméticos, alimentos)?", "sim_nao", 1, None, "Quais?"),
+    ("Usa algum medicamento atualmente?", "sim_nao", 1, None, "Quais?"),
     ("Está grávida ou amamentando?", "sim_nao", 1, None),
     ("Possui alguma destas condições?", "multipla_escolha", 0,
      ["Diabetes", "Hipertensão", "Problemas de cicatrização", "Herpes", "Doença autoimune", "Nenhuma"]),
@@ -45,9 +43,9 @@ def criar():
     mid = d.run("INSERT INTO fichas_modelo (nome,descricao,demonstracao) VALUES (?,?,0)",
                 ("Anamnese geral (modelo inicial)", "Perguntas básicas de saúde. Edite à vontade."))
     vid = d.run("INSERT INTO fichas_versao (modelo_id,numero) VALUES (?,1)", (mid,))
-    for i, (rot, tipo, ob, ops) in enumerate(CAMPOS, 1):
-        d.run("INSERT INTO ficha_campos (versao_id,ordem,rotulo,tipo,obrigatorio,opcoes) VALUES (?,?,?,?,?,?)",
-              (vid, i, rot, tipo, ob, json.dumps(ops, ensure_ascii=False) if ops else None))
+    for i, (rot, tipo, ob, ops, *det) in enumerate(CAMPOS, 1):
+        d.run("INSERT INTO ficha_campos (versao_id,ordem,rotulo,tipo,obrigatorio,opcoes,detalhe) VALUES (?,?,?,?,?,?,?)",
+              (vid, i, rot, tipo, ob, json.dumps(ops, ensure_ascii=False) if ops else None, det[0] if det else None))
     t1 = d.run("INSERT INTO termos_modelo (titulo,tipo,demonstracao) VALUES (?,?,0)", ("Termo de consentimento (modelo inicial)", "consentimento"))
     d.run("INSERT INTO termos_versao (termo_id,numero,conteudo,hash_conteudo) VALUES (?,1,?,?)", (t1, CONSENT, sha256(CONSENT)))
     t2 = d.run("INSERT INTO termos_modelo (titulo,tipo,demonstracao) VALUES (?,?,0)", ("Autorização de uso de imagem (modelo inicial)", "imagem"))

@@ -7,7 +7,7 @@ from flask import Blueprint, abort, current_app, flash, g, redirect, render_temp
 
 from .db import auditar, commit, q, q1, run
 from .documentos import (campos_da_versao, concluir_ficha, formatar_valor, ler_respostas, opcoes_do_campo,
-                         respostas_do_documento, verificar_integridade)
+                         respostas_do_documento, detalhes_do_documento, verificar_integridade)
 from .seguranca import login_required
 
 bp = Blueprint("atendimentos", __name__, url_prefix="/atendimentos")
@@ -201,7 +201,7 @@ def documento(aid, did):
     adendos = q("SELECT ad.*, u.nome AS autor FROM adendos ad LEFT JOIN usuarios u ON u.id=ad.usuario_id WHERE documento_id=? ORDER BY ad.id", (did,))
     return render_template("atendimentos/documento.html", a=a, d=d, campos=campos, respostas=respostas, ass=ass, adendos=adendos,
                            integro=verificar_integridade(did), editavel=(d["tipo"] == "ficha" and d["status"] == "pendente"),
-                           formatar=formatar_valor, opcoes=opcoes_do_campo)
+                           formatar=formatar_valor, opcoes=opcoes_do_campo, detalhes=detalhes_do_documento(did))
 
 
 @bp.route("/<int:aid>/documentos/<int:did>/conferir", methods=["POST"])

@@ -13,11 +13,13 @@
 <div id="campos">
 {% for c in campos %}
 <div class="card campo">
+  <div class="nao-imprimir" style="display:flex;gap:.4rem;justify-content:flex-end"><button type="button" class="btn sec peq" data-acao="sobe" title="Subir">↑ Subir</button><button type="button" class="btn sec peq" data-acao="desce" title="Descer">↓ Descer</button><button type="button" class="btn sec peq" data-acao="remove">Remover pergunta</button></div>
   <div class="cols2">
     <div><label>Pergunta</label><input type="text" name="c{{ loop.index0 }}_rotulo" value="{{ c.rotulo }}"></div>
     <div><label>Tipo de resposta</label><select name="c{{ loop.index0 }}_tipo">{% for k, v in tipos.items() %}<option value="{{ k }}" {{ 'selected' if c.tipo==k }}>{{ v }}</option>{% endfor %}</select></div>
   </div>
   <label>Opções (uma por linha; só para escolha única ou múltipla)</label><textarea name="c{{ loop.index0 }}_opcoes" style="min-height:70px">{{ c.opcoes }}</textarea>
+  <label>Se a resposta for “Sim”, pedir mais detalhes (só para Sim ou não)</label><input type="text" name="c{{ loop.index0 }}_detalhe" value="{{ c.detalhe }}" placeholder="Ex.: Quais? (deixe vazio para não perguntar)">
   <label>Texto de ajuda (opcional)</label><input type="text" name="c{{ loop.index0 }}_ajuda" value="{{ c.ajuda }}">
   <label class="opcao"><input type="checkbox" name="c{{ loop.index0 }}_obrig" value="1" {{ 'checked' if c.obrigatorio }}><span>Resposta obrigatória</span></label>
 </div>
@@ -25,16 +27,18 @@
 </div>
 <input type="hidden" name="n_campos" id="n_campos" value="{{ campos|length }}">
 <button type="button" class="btn sec" id="add">+ Adicionar pergunta</button>
-<p class="ajuda">Para remover uma pergunta, apague o texto dela e salve.</p>
+<p class="ajuda">Use os botões de cada pergunta para mudar a ordem ou remover. Nada é gravado até você clicar em “Salvar ficha”.</p>
 <div class="form-acoes"><button class="btn" type="submit">Salvar ficha</button><a class="btn sec" href="/modelos/">Voltar</a></div>
 </form>
 <template id="modelo-campo">
 <div class="card campo">
+  <div class="nao-imprimir" style="display:flex;gap:.4rem;justify-content:flex-end"><button type="button" class="btn sec peq" data-acao="sobe" title="Subir">↑ Subir</button><button type="button" class="btn sec peq" data-acao="desce" title="Descer">↓ Descer</button><button type="button" class="btn sec peq" data-acao="remove">Remover pergunta</button></div>
   <div class="cols2">
     <div><label>Pergunta</label><input type="text" name="c__I___rotulo"></div>
     <div><label>Tipo de resposta</label><select name="c__I___tipo">{% for k, v in tipos.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select></div>
   </div>
   <label>Opções (uma por linha; só para escolha única ou múltipla)</label><textarea name="c__I___opcoes" style="min-height:70px"></textarea>
+  <label>Se a resposta for “Sim”, pedir mais detalhes (só para Sim ou não)</label><input type="text" name="c__I___detalhe" placeholder="Ex.: Quais? (deixe vazio para não perguntar)">
   <label>Texto de ajuda (opcional)</label><input type="text" name="c__I___ajuda">
   <label class="opcao"><input type="checkbox" name="c__I___obrig" value="1"><span>Resposta obrigatória</span></label>
 </div>
@@ -48,6 +52,23 @@ document.getElementById('add').addEventListener('click', function () {
   document.getElementById('campos').insertAdjacentHTML('beforeend', html);
   n.value = i + 1;
   document.querySelector('#campos .campo:last-child input[type=text]').focus();
+});
+var lista = document.getElementById('campos');
+lista.addEventListener('click', function (e) {
+  var b = e.target.closest('[data-acao]'); if (!b) return;
+  var card = b.closest('.campo'), a = b.dataset.acao;
+  if (a === 'sobe' && card.previousElementSibling) lista.insertBefore(card, card.previousElementSibling);
+  if (a === 'desce' && card.nextElementSibling) lista.insertBefore(card.nextElementSibling, card);
+  if (a === 'remove' && confirm('Remover esta pergunta da ficha? (só vale depois de salvar)')) { card.querySelector('input[type=text]').value = ''; card.hidden = true; }
+});
+// ao salvar, renumera os campos na ordem em que aparecem na tela
+lista.closest('form').addEventListener('submit', function () {
+  Array.prototype.forEach.call(lista.querySelectorAll('.campo'), function (card, k) {
+    Array.prototype.forEach.call(card.querySelectorAll('[name^="c"]'), function (el) {
+      el.name = el.name.replace(/^c\d+_/, 'c' + k + '_');
+    });
+  });
+  document.getElementById('n_campos').value = lista.querySelectorAll('.campo').length;
 });
 </script>
 {% endblock %}
