@@ -25,6 +25,10 @@ def close_db(_exc=None):
 def init_db():
     db = get_db()
     db.executescript(SCHEMA.read_text(encoding="utf-8"))
+    # bancos criados por versões anteriores: acrescenta colunas novas
+    for tabela, coluna in (("ficha_campos", "detalhe"), ("respostas", "detalhe")):
+        if coluna not in [r[1] for r in db.execute(f"PRAGMA table_info({tabela})")]:
+            db.execute(f"ALTER TABLE {tabela} ADD COLUMN {coluna} TEXT")
     db.commit()
 
 

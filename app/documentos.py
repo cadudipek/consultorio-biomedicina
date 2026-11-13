@@ -76,13 +76,20 @@ def ler_respostas(campos, form):
                     erros.append(f"“{c['rotulo']}”: opção inválida.")
         if c["obrigatorio"] and not valor:
             erros.append(f"“{c['rotulo']}” é obrigatório.")
+        if c["tipo"] == "sim_nao" and c["detalhe"]:
+            det = (form.get(f"detalhe_{c['id']}") or "").strip()[:500]
+            if valor == "Sim" and not det:
+                erros.append(f"“{c['rotulo']}”: preencha “{c['detalhe']}”.")
+            valores[("d", c["id"])] = det if valor == "Sim" else ""
         valores[c["id"]] = valor
     return valores, erros
 
 
-def formatar_valor(campo, valor):
+def formatar_valor(campo, valor, detalhe=None):
     if not valor:
         return "—"
+    if detalhe:
+        return f"{valor} — {detalhe}"
     if campo["tipo"] == "multipla_escolha":
         try:
             return ", ".join(json.loads(valor)) or "—"
@@ -96,6 +103,10 @@ def formatar_valor(campo, valor):
     return valor
 
 
+def detalhes_do_documento(doc_id):
+    return {r["campo_id"]: r["detalhe"] for r in q("SELECT campo_id,detalhe FROM respostas WHERE documento_id=? AND detalhe IS NOT NULL AND detalhe!=''", (doc_id,))}
+
+
 def respostas_do_documento(doc_id):
     return {r["campo_id"]: r["valor"] for r in q("SELECT campo_id,valor FROM respostas WHERE documento_id=?", (doc_id,))}
 
@@ -107,13 +118,15 @@ def documento_completo(doc_id):
 
 
 # ---------------- Ficha ----------------
-def _payload_ficha(doc, valores_por_campo, concluido_em, campos):
+def _payload_ficha(doc, valores_por_campo, concluido_em, campos, detalhes=None):
+    detalhes = detalhes or {}
     return {
         "tipo": "ficha",
         "atendimento": doc["atendimento_id"],
         "ficha_versao": doc["ficha_versao_id"],
         "concluido_em": concluido_em,
-        "respostas": [[c["id"], c["rotulo"], valores_por_campo.get(c["id"], "")] for c in campos],
+        "respostas": [[c["id"], c["rotulo"], valores_por_campo.get(c["id"], "")] + ([detalhes[c["id"]]] if detalhes.get(c["id"]) else [])
+                      for c in campos],
     }
 
 
@@ -121,9 +134,11 @@ def concluir_ficha(doc, valores, origem):
     """Grava as respostas, trava o documento e registra o hash."""
     campos = campos_da_versao(doc["ficha_versao_id"])
     for c in campos:
-        run("INSERT INTO respostas (documento_id,campo_id,valor) VALUES (?,?,?)", (doc["id"], c["id"], valores.get(c["id"], "")))
+        run("INSERT INTO respostas (documento_id,campo_id,valor,detalhe) VALUES (?,?,?,?)",
+            (doc["id"], c["id"], valores.get(c["id"], ""), valores.get(("d", c["id"])) or None))
     agora = agora_utc()
-    h = sha256(canonico(_payload_ficha(doc, valores, agora, campos)))
+    detalhes = {c["id"]: valores.get(("d", c["id"])) for c in campos}
+    h = sha256(canonico(_payload_ficha(doc, valores, agora, campos, detalhes)))
     run("UPDATE atendimento_documentos SET status='preenchido', concluido_em=?, hash_documento=? WHERE id=?",
         (agora, h, doc["id"]))
     auditar("ficha_preenchida", "atendimento_documentos", doc["id"], {"origem": origem, "hash": h})
@@ -197,7 +212,7 @@ def verificar_integridade(doc_id):
     if doc["tipo"] == "ficha":
         campos = campos_da_versao(doc["ficha_versao_id"])
         valores = respostas_do_documento(doc_id)
-        h = sha256(canonico(_payload_ficha(doc, valores, doc["concluido_em"], campos)))
+        h = sha256(canonico(_payload_ficha(doc, valores, doc["concluido_em"], campos, detalhes_do_documento(doc_id))))
     else:
         a = q1("SELECT * FROM assinaturas WHERE documento_id=?", (doc_id,))
         v = q1("SELECT * FROM termos_versao WHERE id=?", (doc["termo_versao_id"],))

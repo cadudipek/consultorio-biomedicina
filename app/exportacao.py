@@ -16,7 +16,7 @@ from reportlab.platypus import HRFlowable, Image as RLImage, Paragraph, SimpleDo
 
 from .backup import fazer_backup, listar_backups
 from .db import auditar, commit, q, q1
-from .documentos import campos_da_versao, formatar_valor, respostas_do_documento, verificar_integridade
+from .documentos import campos_da_versao, detalhes_do_documento, formatar_valor, respostas_do_documento, verificar_integridade
 from .seguranca import login_required
 
 bp = Blueprint("exportacao", __name__)
@@ -56,7 +56,8 @@ def _bloco_documento(d, a, st):
     itens.append(Paragraph(f"Situação: {ROTULO_STATUS.get(d['status'], d['status'])}", st["pq"]))
     if d["tipo"] == "ficha":
         resp = respostas_do_documento(d["id"])
-        linhas = [[Paragraph(f"<b>{_txt(c['rotulo'])}</b>", st["p"]), Paragraph(_txt(formatar_valor(c, resp.get(c["id"]))), st["p"])]
+        det = detalhes_do_documento(d["id"])
+        linhas = [[Paragraph(f"<b>{_txt(c['rotulo'])}</b>", st["p"]), Paragraph(_txt(formatar_valor(c, resp.get(c["id"]), det.get(c["id"]))), st["p"])]
                   for c in campos_da_versao(d["ficha_versao_id"])]
         if linhas:
             t = Table(linhas, colWidths=[6 * cm, 11 * cm])
@@ -172,8 +173,9 @@ def montar_zip():
     for d in q("SELECT d.id, d.atendimento_id, d.ficha_versao_id, m.nome FROM atendimento_documentos d "
                "JOIN fichas_versao fv ON fv.id=d.ficha_versao_id JOIN fichas_modelo m ON m.id=fv.modelo_id WHERE d.status!='pendente' ORDER BY d.id"):
         resp = respostas_do_documento(d["id"])
+        det = detalhes_do_documento(d["id"])
         for c in campos_da_versao(d["ficha_versao_id"]):
-            linhas.append([d["atendimento_id"], d["nome"], c["rotulo"], formatar_valor(c, resp.get(c["id"]))])
+            linhas.append([d["atendimento_id"], d["nome"], c["rotulo"], formatar_valor(c, resp.get(c["id"]), det.get(c["id"]))])
     arquivos["respostas_das_fichas.csv"] = _csv(["atendimento", "ficha", "pergunta", "resposta"], linhas)
     arquivos["assinaturas.csv"] = _csv(
         ["documento", "signatario", "cpf", "aceite", "assinado_em_utc", "ip", "sha256"],

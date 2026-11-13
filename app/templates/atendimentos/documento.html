@@ -17,7 +17,7 @@
   </form>
   {% else %}
   <div class="card">
-    {% for c in campos %}<div class="linha-lista" style="display:block"><div class="meta">{{ c.rotulo }}{% if c.obrigatorio %} *{% endif %}</div><div>{{ formatar(c, respostas.get(c.id)) }}</div></div>{% endfor %}
+    {% for c in campos %}<div class="linha-lista" style="display:block"><div class="meta">{{ c.rotulo }}{% if c.obrigatorio %} *{% endif %}</div><div>{{ formatar(c, respostas.get(c.id), detalhes.get(c.id)) }}</div></div>{% endfor %}
   </div>
   {% endif %}
 {% else %}

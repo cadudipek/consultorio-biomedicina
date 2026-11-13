@@ -18,6 +18,7 @@
   <div class="pergunta"><b>{{ loop.index }}. {{ c.rotulo }}{% if c.obrigatorio %} *{% endif %}</b>
     {% if c.ajuda %}<div class="rot">{{ c.ajuda }}</div>{% endif %}
     {% if c.tipo == 'sim_nao' %}<div class="opcoes-imp"><span><i class="caixa"></i>Sim</span><span><i class="caixa"></i>Não</span></div>
+      {% if c.detalhe %}<div style="margin-top:.3rem;display:flex;gap:.5rem;align-items:flex-end"><span class="rot">Se sim, {{ c.detalhe|lower }}</span><div class="linha-em-branco" style="flex:1"></div></div>{% endif %}
     {% elif c.tipo in ('escolha_unica','multipla_escolha') %}<div class="opcoes-imp">{% for o in c.lista %}<span><i class="caixa"></i>{{ o }}</span>{% endfor %}</div>
     {% elif c.tipo == 'data' %}<div>____ / ____ / ________</div>
     {% elif c.tipo == 'texto_longo' %}<div class="linha-em-branco"></div><div class="linha-em-branco"></div><div class="linha-em-branco"></div>

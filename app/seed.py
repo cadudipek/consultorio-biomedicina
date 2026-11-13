@@ -26,7 +26,7 @@ Esta autorização é independente do consentimento do procedimento. Escolho, ab
 
 CAMPOS_ANAMNESE = [
     ("Queixa principal (exemplo)", "texto_longo", 1, None),
-    ("Possui alguma alergia?", "sim_nao", 1, None),
+    ("Possui alguma alergia?", "sim_nao", 1, None, "Quais?"),
     ("Tipo de pele (exemplo)", "escolha_unica", 0, ["Seca", "Oleosa", "Mista", "Normal"]),
     ("Hábitos (exemplo)", "multipla_escolha", 0, ["Fuma", "Consome álcool", "Pratica exercícios", "Usa protetor solar"]),
     ("Peso (kg)", "numero", 0, None),
@@ -65,9 +65,9 @@ def carregar():
     # Ficha
     mid = d.run("INSERT INTO fichas_modelo (nome,descricao,demonstracao) VALUES (?,?,1)", ("Anamnese Exemplo (demonstração)", "Modelo fictício"))
     vid = d.run("INSERT INTO fichas_versao (modelo_id,numero) VALUES (?,1)", (mid,))
-    for i, (rot, tipo, ob, ops) in enumerate(CAMPOS_ANAMNESE, 1):
-        d.run("INSERT INTO ficha_campos (versao_id,ordem,rotulo,tipo,obrigatorio,opcoes) VALUES (?,?,?,?,?,?)",
-              (vid, i, rot, tipo, ob, json.dumps(ops, ensure_ascii=False) if ops else None))
+    for i, (rot, tipo, ob, ops, *det) in enumerate(CAMPOS_ANAMNESE, 1):
+        d.run("INSERT INTO ficha_campos (versao_id,ordem,rotulo,tipo,obrigatorio,opcoes,detalhe) VALUES (?,?,?,?,?,?,?)",
+              (vid, i, rot, tipo, ob, json.dumps(ops, ensure_ascii=False) if ops else None, det[0] if det else None))
     # Termos
     t1 = d.run("INSERT INTO termos_modelo (titulo,tipo,demonstracao) VALUES (?,?,1)", ("Consentimento — EXEMPLO (demonstração)", "consentimento"))
     d.run("INSERT INTO termos_versao (termo_id,numero,conteudo,hash_conteudo) VALUES (?,1,?,?)", (t1, TERMO_CONSENT, sha256(TERMO_CONSENT)))
