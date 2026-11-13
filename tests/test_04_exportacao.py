@@ -17,7 +17,7 @@ def concluir_tudo(pro, app):
 
 def test_pdf_do_atendimento(pro, app):
     montar_cenario(pro)
-    assert pro.get("/atendimentos/1/pdf").status_code == 404  # nada concluído ainda
+    assert pro.get("/atendimentos/1/pdf").status_code == 302  # nada concluído ainda: avisa e volta
     concluir_tudo(pro, app)
     r = pro.get("/atendimentos/1/pdf")
     assert r.status_code == 200 and r.mimetype == "application/pdf" and r.data[:5] == b"%PDF-" and len(r.data) > 2000
