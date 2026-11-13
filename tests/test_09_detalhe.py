@@ -39,3 +39,11 @@ def test_alergia_pede_quais(app, pro):
     with app.app_context():
         from app.documentos import verificar_integridade
         assert verificar_integridade(d["id"]) is True
+
+
+def test_pdf_sem_documentos_concluidos_avisa_em_vez_de_erro(app, pro):
+    _ficha_com_detalhe(app, pro)
+    pro.post("/pacientes/novo", {"nome": "Paciente Fictício", "cpf": "11144477735", "telefone": "31999990000"})
+    pro.post("/atendimentos/novo", {"paciente": 1, "procedimento": 1, "data_atendimento": "2026-11-13"})
+    r = pro.get("/atendimentos/1/pdf")
+    assert r.status_code == 302 and r.headers["Location"].endswith("/atendimentos/1")

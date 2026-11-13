@@ -120,6 +120,9 @@ def gerar_pdf(aid, did=None):
 @bp.route("/atendimentos/<int:aid>/pdf")
 @login_required("profissional")
 def pdf_atendimento(aid):
+    if not q1("SELECT 1 FROM atendimento_documentos WHERE atendimento_id=? AND status!='pendente'", (aid,)):
+        flash("Ainda não há documentos preenchidos neste atendimento. O PDF é gerado depois que a paciente preencher a ficha ou assinar um termo.", "info")
+        return redirect(url_for("atendimentos.detalhe", aid=aid))
     buf, a = gerar_pdf(aid)
     auditar("exportar_pdf", "atendimentos", aid)
     commit()
