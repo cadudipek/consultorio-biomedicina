@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block titulo %}Biblioteca de modelos{% endblock %}
+{% block conteudo %}
+<h1>Biblioteca de modelos</h1>
+<p class="meta">Guarde aqui as fichas e termos que você já usa (PDF, Word ou foto) e imprima quando precisar. Para montar uma ficha nova dentro do sistema, use <a href="/modelos/">Fichas e termos</a>.</p>
+<div class="card">
+  <h2 style="margin-top:0">Enviar um modelo</h2>
+  <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Arquivo (PDF, Word, ODT, PNG ou JPG, até 12 MB)<input type="file" name="arquivo" required accept=".pdf,.docx,.odt,.png,.jpg,.jpeg"></label>
+    <label>Nome do modelo (opcional)<input name="titulo" maxlength="150" placeholder="Ex.: Ficha de anamnese facial"></label>
+    <label>Tipo<select name="categoria">{% for k,v in categorias.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select></label>
+    <button class="btn">Guardar na biblioteca</button>
+  </form>
+</div>
+{% for k,v in categorias.items() %}{% set grupo = itens|selectattr('categoria','equalto',k)|list %}{% if grupo %}
+<div class="card"><h2 style="margin-top:0">{{ v }}</h2>
+  {% for i in grupo %}
+  <div class="linha-lista">
+    <div><strong>{{ i.titulo }}</strong><div class="meta">{{ i.nome_original }} · {{ (i.tamanho/1024)|round|int }} KB</div></div>
+    <div style="display:flex;gap:.4rem">
+      <a class="btn sec peq" href="/biblioteca/{{ i.id }}/abrir">{{ 'Abrir e imprimir' if abre_no_app(i) else 'Baixar para abrir no Word' }}</a>
+      <form method="post" action="/biblioteca/{{ i.id }}/remover" onsubmit="return confirm('Remover este modelo da biblioteca?')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn sec peq">Remover</button></form>
+    </div>
+  </div>{% endfor %}
+</div>{% endif %}{% endfor %}
+{% if not itens %}<div class="card vazio">Nenhum modelo guardado ainda. Envie o primeiro acima.</div>{% endif %}
+{% endblock %}

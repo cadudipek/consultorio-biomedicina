@@ -184,3 +184,25 @@ def termo_alternar(tid):
     auditar("alternar_ativo", "termos_modelo", tid)
     commit()
     return redirect(url_for("modelos.lista"))
+
+
+# ------------------------------------------------------------------ Impressão em branco
+@bp.route("/fichas/<int:mid>/imprimir")
+@login_required("profissional")
+def ficha_imprimir(mid):
+    modelo = q1("SELECT * FROM fichas_modelo WHERE id=?", (mid,)) or abort(404)
+    versao = _versao_atual(mid)
+    campos = [{**dict(c), "lista": opcoes_do_campo(c)} for c in campos_da_versao(versao["id"])]
+    auditar("imprimir_em_branco", "fichas_modelo", mid, {"versao": versao["numero"]})
+    commit()
+    return render_template("modelos/imprimir_ficha.html", modelo=modelo, versao=versao, campos=campos)
+
+
+@bp.route("/termos/<int:tid>/imprimir")
+@login_required("profissional")
+def termo_imprimir(tid):
+    termo = q1("SELECT * FROM termos_modelo WHERE id=?", (tid,)) or abort(404)
+    versao = q1("SELECT * FROM termos_versao WHERE termo_id=? ORDER BY numero DESC LIMIT 1", (tid,))
+    auditar("imprimir_em_branco", "termos_modelo", tid, {"versao": versao["numero"]})
+    commit()
+    return render_template("modelos/imprimir_termo.html", termo=termo, versao=versao)
